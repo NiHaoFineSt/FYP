@@ -1,0 +1,88 @@
+/* History Log Specific Styles */
+
+.history-section {
+    background: white;
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.02);
+    border: 1px solid #edf2f7;
+    margin-top: 20px;
+}
+
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.history-table th {
+    text-align: left;
+    padding: 15px;
+    background: #f8fafc;
+    color: #4a5568;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #edf2f7;
+}
+
+.history-table td {
+    padding: 18px 15px;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 0.95rem;
+    color: #2d3748;
+}
+
+/* Status Pills */
+.status-pill {
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.status-pill.accepted {
+    background: #f0fff4;
+    color: #2f855a;
+    border: 1px solid #c6f6d5;
+}
+
+.status-pill.rejected {
+    background: #fff5f5;
+    color: #c53030;
+    border: 1px solid #fed7d7;
+}
+
+/* Capacity Impact Styling */
+.impact-plus {
+    color: #2d5a27;
+    font-weight: bold;
+}
+
+.impact-none {
+    color: #a0aec0;
+}
+
+/* Header Filters */
+.filter-group {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-filter {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    background: white;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-filter.active {
+    background: #2d5a27;
+    color: white;
+    border-color: #2d5a27;
+}
+
+.btn-filter:hover:not(.active) {
+    background: #f7fafc;
+}

@@ -1,0 +1,55 @@
+/* =========================================
+   CHAT SYSTEM SPECIFICS
+   ========================================= */
+
+.chat-wrapper {
+    overflow: hidden;
+    border: 1px solid var(--border);
+}
+
+.contact:hover {
+    background: #f8f9f8;
+}
+
+.contact.active {
+    background: var(--accent-mint);
+    border-left: 4px solid var(--primary-dark);
+}
+
+.chat-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+    background: #ddd;
+    border-radius: 10px;
+}
+
+/* Responsive Tweak for Chat */
+@media (max-width: 992px) {
+    .chat-list {
+        width: 80px;
+    }
+    .chat-list .contact p, 
+    .chat-list .contact h4, 
+    .chat-list input {
+        display: none;
+    }
+    .chat-list .contact {
+        text-align: center;
+        padding: 1rem 0;
+    }
+}
+
+/* Ensure Chat Header aligns with Profile style */
+.chat-main-header h3 {
+    color: var(--primary-dark);
+}
+
+.msg.outgoing p {
+    color: white;
+}
+
+.msg.incoming p {
+    color: var(--text-main);
+}

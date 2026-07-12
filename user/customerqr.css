@@ -1,0 +1,48 @@
+/* QR Specific Layout */
+.qr-display-container {
+    max-width: 500px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 15px;
+    border: 1px solid #eee;
+}
+
+#qrcode-box {
+    display: inline-block;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 20px;
+    margin-bottom: 15px;
+}
+
+#qrcode img {
+    margin: 0 auto;
+    border: 5px solid white;
+    border-radius: 10px;
+}
+
+.user-id-text {
+    font-size: 1.2rem;
+    color: #333;
+    margin: 10px 0 5px 0;
+}
+
+.hint-text {
+    font-size: 0.85rem;
+    color: #888;
+}
+
+/* Matching the Staff Dashboard logic */
+.qr-meta {
+    border-top: 1px solid #f0f0f0;
+    margin-top: 20px;
+    padding-top: 15px;
+}
+
+/* Ensure the sidebar active state matches the theme */
+.side-nav a.active {
+    background: #e8f5e9;
+    color: #2d5a27;
+    border-left: 4px solid #68b04d;
+}

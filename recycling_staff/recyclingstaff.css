@@ -1,0 +1,126 @@
+.dashboard-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar Navigation */
+.sidebar {
+    width: 260px;
+    background: #2d5a27;
+    color: white;
+    padding: 2rem 0;
+    position: fixed;
+    height: 100vh;
+}
+
+.sidebar .logo {
+    padding: 0 2rem 2.5rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.sidebar .logo span { color: #68b04d; }
+
+.side-nav a {
+    color: #aec6ab;
+    text-decoration: none;
+    padding: 1.2rem 2rem;
+    display: block;
+    transition: 0.3s;
+}
+
+.side-nav a:hover, .side-nav a.active {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border-left: 4px solid #68b04d;
+}
+
+.nav-divider {
+    height: 1px;
+    background: rgba(255,255,255,0.1);
+    margin: 2rem 0;
+}
+
+.logout { color: #ff9999 !important; }
+
+/* Main Content Area */
+.dashboard-content {
+    flex: 1;
+    margin-left: 260px;
+    padding: 2.5rem 5%;
+    background: #f4f7f4;
+}
+
+.dash-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+}
+
+.user-badge {
+    background: #68b04d;
+    color: white;
+    padding: 0.6rem 1.2rem;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+.activity-section {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+
+.section-header { display: flex; justify-content: space-between; margin-bottom: 1.5rem; }
+.view-all { color: #68b04d; text-decoration: none; font-size: 0.9rem; font-weight: bold; }
+
+.activity-table { width: 100%; border-collapse: collapse; }
+.activity-table th { text-align: left; padding: 1rem; color: #777; border-bottom: 1px solid #eee; }
+.activity-table td { padding: 1rem; border-bottom: 1px solid #f9f9f9; vertical-align: middle; }
+
+/* Staff Action Buttons */
+.btn-action {
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+    border: none;
+    outline: none;
+}
+
+.btn-action.approve {
+    background: #e8f5e9; /* Light green */
+    color: #2d5a27;      /* Dark green text */
+    margin-right: 5px;
+}
+
+.btn-action.approve:hover {
+    background: #2d5a27;
+    color: white;
+}
+
+.btn-action.reject {
+    background: #fff0f0; /* Light red */
+    color: #c0392b;      /* Dark red text */
+}
+
+.btn-action.reject:hover {
+    background: #c0392b;
+    color: white;
+}
+
+/* Maintain identical table cell alignment as Citizen Dashboard */
+.activity-table td {
+    vertical-align: middle;
+}
+
+/* Shared UI Components */
+.nav-divider {
+    height: 1px;
+    background: rgba(255,255,255,0.1);
+    margin: 2rem 0;
+}

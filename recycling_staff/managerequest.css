@@ -1,0 +1,107 @@
+/* =========================================
+   1. CORE VARIABLES & BASE RESET
+   ========================================= */
+:root {
+    --primary-dark: #2d5a27;   
+    --primary-light: #68b04d;  
+    --accent-mint: #e8f5e9;    
+    --bg-light: #f4f7f4;       
+    --white: #ffffff;
+    --text-main: #333333;
+    --text-muted: #777777;
+    --danger: #c0392b;         
+    --border: #eeeeee;
+    --shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+* {
+    margin: 0; padding: 0; box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+    background-color: var(--bg-light);
+    color: var(--text-main);
+    overflow-x: hidden;
+}
+
+/* =========================================
+   2. LAYOUT
+   ========================================= */
+.dashboard-wrapper { display: flex; min-height: 100vh; }
+
+.sidebar {
+    width: 260px; background: var(--primary-dark);
+    color: var(--white); position: fixed;
+    height: 100vh; padding-top: 2rem;
+}
+
+.sidebar .logo { padding: 0 2rem 2.5rem; font-size: 1.6rem; font-weight: bold; }
+.sidebar .logo span { color: var(--primary-light); }
+
+.side-nav a {
+    color: #aec6ab; text-decoration: none;
+    padding: 1.2rem 2rem; display: block;
+    border-left: 4px solid transparent; transition: 0.3s;
+}
+
+.side-nav a.active, .side-nav a:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--white); border-left-color: var(--primary-light);
+}
+
+.nav-divider { height: 1px; background: rgba(255, 255, 255, 0.1); margin: 1.5rem 0; }
+.logout { color: #ff9999 !important; }
+
+.dashboard-content { flex: 1; margin-left: 260px; padding: 2.5rem 5%; }
+.dash-header { display: flex; justify-content: space-between; margin-bottom: 2rem; }
+
+/* =========================================
+   3. STAT CARDS & SECTIONS
+   ========================================= */
+.stats-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem; margin-bottom: 2.5rem;
+}
+
+.stat-card {
+    background: var(--white); padding: 1.5rem;
+    border-radius: 12px; box-shadow: var(--shadow);
+}
+
+.stat-card h4 { color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; }
+.stat-card p { font-size: 1.8rem; font-weight: bold; color: var(--primary-dark); margin-top: 0.5rem; }
+.stat-card p span { font-size: 1rem; color: var(--text-muted); }
+
+.activity-section {
+    background: var(--white); padding: 2rem;
+    border-radius: 15px; box-shadow: var(--shadow);
+}
+
+.section-header { display: flex; justify-content: space-between; margin-bottom: 1.5rem; }
+
+/* =========================================
+   4. TABLES & STAFF ACTIONS
+   ========================================= */
+.activity-table { width: 100%; border-collapse: collapse; }
+.activity-table th { text-align: left; padding: 1rem; color: var(--text-muted); border-bottom: 1px solid var(--border); }
+.activity-table td { padding: 1rem; border-bottom: 1px solid #f9f9f9; vertical-align: middle; }
+
+/* Material Tags */
+.material-tag { display: inline-block; padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; }
+.plastic { background: #e3f2fd; color: #1976d2; }
+.metal { background: #fff3e0; color: #f57c00; }
+.glass { background: #f3e5f5; color: #7b1fa2; }
+
+/* Staff Specific Buttons */
+.btn-action { padding: 6px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; border: none; transition: 0.2s; }
+.btn-action.approve { background: var(--accent-mint); color: var(--primary-dark); margin-right: 5px; }
+.btn-action.approve:hover { background: var(--primary-dark); color: white; }
+.btn-action.reject { background: #fff0f0; color: var(--danger); }
+.btn-action.reject:hover { background: var(--danger); color: white; }
+
+/* Filters */
+.filter-btn { padding: 0.5rem 1.2rem; border-radius: 20px; border: 1px solid #ddd; background: white; cursor: pointer; }
+.filter-btn.active { background: var(--primary-dark); color: white; border-color: var(--primary-dark); }
+
+.user-badge { padding: 0.5rem 1rem; border-radius: 20px; color: white; font-weight: bold; font-size: 0.8rem; }

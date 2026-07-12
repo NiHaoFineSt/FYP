@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Profile | RecycleHub</title>
+    <link rel="stylesheet" href="staffprofile.css">
+</head>
+<body>
+
+    <div class="dashboard-wrapper">
+        <aside class="sidebar">
+            <div class="logo">Recycle<span>Hub</span></div>
+            <nav class="side-nav">
+                <a href="recyclingstaff.html">Overview</a>
+                <a href="managerequest.html">Manage Requests</a>
+                <a href="inventorylog.html">Inventory Log</a>
+                <a href="staffscan.html" class="active">Scan QR</a>
+                <a href="factory.html">Factory Recs</a>
+                <a href="staffchat.html">Staff Chat</a>
+                <a href="#" class="active">Profile</a>
+                <div class="nav-divider"></div>
+                <a href="homepage.html" class="logout">Logout</a>
+            </nav>
+        </aside>
+
+        <main class="dashboard-content">
+            <header class="dash-header">
+                <div>
+                    <h2>My Profile</h2>
+                    <p>Manage your professional credentials and account settings.</p>
+                </div>
+                <div class="user-badge" style="background: var(--primary-dark);">Staff ID: #STF-402</div>
+            </header>
+
+            <div class="profile-layout" style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem;">
+                
+                <section class="activity-section" style="text-align: center;">
+                    <div class="avatar-large" style="width: 120px; height: 120px; background: var(--accent-mint); border-radius: 50%; margin: 0 auto 1.5rem; display: flex; align-items: center; justify-content: center; font-size: 3rem; color: var(--primary-dark); border: 4px solid var(--primary-light);">
+                        JD
+                    </div>
+                    <h3>Abu</h3>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">Senior Verification Officer</p>
+                    <div class="material-tag" style="background: var(--primary-dark); color: white;">Full-Time</div>
+                    
+                    <hr style="margin: 2rem 0; border: 0; border-top: 1px solid var(--border);">
+                    
+                    <div style="text-align: left;">
+                        <h4 style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted);">Current Shift</h4>
+                        <p style="font-weight: 600; margin-bottom: 1rem;">Morning (08:00 - 16:00)</p>
+                        
+                        <h4 style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted);">Assigned Hub</h4>
+                        <p style="font-weight: 600;">Downtown CRC - Level 2</p>
+                    </div>
+                </section>
+
+                <section class="activity-section">
+                    <div class="section-header">
+                        <h3>Account Settings</h3>
+                    </div>
+                    
+                    <form class="profile-form">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                            <div class="input-group">
+                                <label>First Name</label>
+                                <input type="text" value="John">
+                            </div>
+                            <div class="input-group">
+                                <label>Last Name</label>
+                                <input type="text" value="Doe">
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label>Email Address</label>
+                            <input type="email" value="j.doe@recyclehub.com">
+                        </div>
+
+                        <div class="input-group">
+                            <label>Work Phone</label>
+                            <input type="tel" value="+1 (555) 012-3456">
+                        </div>
+
+                        <div class="section-header" style="margin-top: 2rem;">
+                            <h3>Security</h3>
+                        </div>
+
+                        <div class="input-group">
+                            <label>Current Password</label>
+                            <input type="password" placeholder="••••••••">
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                            <div class="input-group">
+                                <label>New Password</label>
+                                <input type="password" placeholder="Leave blank to keep current">
+                            </div>
+                            <div class="input-group">
+                                <label>Confirm New Password</label>
+                                <input type="password" placeholder="Leave blank to keep current">
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+                            <button type="submit" class="btn-primary">Update Profile</button>
+                            <button type="button" class="btn-outline">Cancel Changes</button>
+                        </div>
+                    </form>
+                </section>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | RecycleHub</title>
+    <link rel="stylesheet" href="relog.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">Recycle<span>Hub</span></div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="#" class="btn-primary">Sign In</a></li>
+        </ul>
+    </nav>
+
+    <section class="auth-screen">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h2>Join the Hub</h2>
+                <p>Select your role to get started</p>
+            </div>
+
+            <form>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Full Name</label>
+                        <input type="text" placeholder="John Doe" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Account Type</label>
+                    <select class="custom-select" required>
+                        <option value="" disabled selected>Who are you?</option>
+                        <option value="user">Individual User</option>
+                        <option value="factory">Factory Personnel</option>
+                        <option value="mrcf">MRCF Personnel</option>
+                        <option value="crc">CRC Personnel</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label>Email Address</label>
+                    <input type="email" placeholder="name@company.com" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" placeholder="••••••••" required>
+                </div>
+
+                <button type="submit" class="btn-primary btn-full">Create Account</button>
+            </form>
+
+            <p class="auth-switch">Already have an account? <a href="login page.html">Login here</a></p>
+        </div>
+    </section>
+
+</body>
+</html>

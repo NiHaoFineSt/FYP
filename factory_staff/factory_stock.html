@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request History | RecycleHub</title>
+    <link rel="stylesheet" href="managerequest.css">
+    <link rel="stylesheet" href="factory_stock.css">
+</head>
+<body>
+
+    <div class="dashboard-wrapper">
+        <aside class="sidebar">
+            <div class="logo">Recycle<span>Hub</span></div>
+            <nav class="side-nav">
+                <a href="factorystaff.html">Incoming Requests</a>
+                <a href="factory_stock.html" class="active">Request History</a>
+                <div class="nav-divider"></div>
+                <a href="homepage.html" class="logout">Logout</a>
+            </nav>
+        </aside>
+
+        <main class="dashboard-content">
+            <header class="dash-header">
+                <h2>Factory Request History</h2>
+                <button class="btn-primary" onclick="clearLogs()">Clear History</button>
+            </header>
+
+            <section class="history-table-card">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Date/Time</th>
+                            <th>ID</th>
+                            <th>Material</th>
+                            <th>Weight</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-data">
+                        </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        function loadHistory() {
+            const container = document.getElementById('history-data');
+            const data = JSON.parse(localStorage.getItem('factoryHistory')) || [];
+            
+            if(data.length === 0) {
+                container.innerHTML = "<tr><td colspan='5'>No history available.</td></tr>";
+                return;
+            }
+
+            container.innerHTML = data.reverse().map(item => `
+                <tr>
+                    <td>${item.time}</td>
+                    <td>${item.id}</td>
+                    <td>${item.material}</td>
+                    <td>${item.weight}</td>
+                    <td><span class="status-pill ${item.status.toLowerCase()}">${item.status}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        function clearLogs() {
+            if(confirm("Delete all history logs?")) {
+                localStorage.removeItem('factoryHistory');
+                location.reload();
+            }
+        }
+
+        window.onload = loadHistory;
+    </script>
+</body>
+</html>

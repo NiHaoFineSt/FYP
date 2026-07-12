@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Factory Recommendations | RecycleHub Staff</title>
+    <link rel="stylesheet" href="factory.css">
+</head>
+<body>
+
+    <div class="dashboard-wrapper">
+        <aside class="sidebar">
+            <div class="logo">Recycle<span>Hub</span></div>
+            <nav class="side-nav">
+                <a href="recyclingstaff.html">Overview</a>
+                <a href="managerequest.html">Manage Requests</a>
+                <a href="inventorylog.html">Inventory Log</a>
+                <a href="staffscan.html" class="active">Scan QR</a>
+                <a href="#" class="active">Factory Recs</a>
+                <a href="staffchat.html">Staff Chat</a>
+                <a href="staffprofile.html">Profile</a>
+                <div class="nav-divider"></div>
+                <a href="homepage.html" class="logout">Logout</a>
+            </nav>
+        </aside>
+
+        <main class="dashboard-content">
+            <header class="dash-header">
+                <div>
+                    <h2>Factory Recommendations</h2>
+                    <p>Optimized partners for high-capacity material processing.</p>
+                </div>
+                <div class="user-badge" style="background: var(--primary-light);">Auto-Sync: Active</div>
+            </header>
+
+            <section class="activity-section" style="margin-bottom: 2rem;">
+                <div class="section-header">
+                    <h3>Processing Network</h3>
+                    <div class="map-filters">
+                        <button class="filter-btn active">Nearest First</button>
+                        <button class="filter-btn">High Payout</button>
+                    </div>
+                </div>
+                <div class="map-container">
+                    <iframe 
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15935.807851613!2d101.520!3d3.073!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zM8KwMDQnMjIuOCJOIDEwMcKwMzEnMTIuMCJF!5e0!3m2!1sen!2smy!4v1620000000000!5m2!1sen!2smy" 
+                        width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy">
+                    </iframe>
+                </div>
+            </section>
+
+            <section class="activity-section">
+                <div class="section-header">
+                    <h3>Recommended Partners</h3>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="activity-table">
+                        <thead>
+                            <tr>
+                                <th>Factory Name</th>
+                                <th>Specialization</th>
+                                <th>Distance</th>
+                                <th>Load Capacity</th>
+                                <th>Current Rate</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Global PET Solutions</strong></td>
+                                <td><div class="material-tag plastic">Plastic (PET/HDPE)</div></td>
+                                <td>4.2 km</td>
+                                <td><span class="status-verified">High</span></td>
+                                <td>$0.45 / kg</td>
+                                <td><button class="btn-primary" style="padding: 5px 15px;">Request</button></td>
+                            </tr>
+                            <tr>
+                                <td><strong>IronMountain Smelters</strong></td>
+                                <td><div class="material-tag metal">Aluminum / Steel</div></td>
+                                <td>8.7 km</td>
+                                <td><span class="status-pending" style="background: #e3f2fd; color: #1976d2;">Medium</span></td>
+                                <td>$1.20 / kg</td>
+                                <td><button class="btn-primary" style="padding: 5px 15px;">Request</button></td>
+                            </tr>
+                            <tr>
+                                <td><strong>EcoGlass Processing</strong></td>
+                                <td><div class="material-tag glass">Glass Bottles</div></td>
+                                <td>12.1 km</td>
+                                <td><span class="status-verified">High</span></td>
+                                <td>$0.15 / kg</td>
+                                <td><button class="btn-primary" style="padding: 5px 15px;">Request</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+</body>
+</html>

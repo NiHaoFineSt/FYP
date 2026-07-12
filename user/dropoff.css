@@ -1,0 +1,311 @@
+/* =========================================
+   1. GLOBAL VARIABLES & BASE RESET
+   ========================================= */
+:root {
+    --primary-dark: #2d5a27;   /* Forest Green */
+    --primary-light: #68b04d;  /* Leaf Green */
+    --accent-mint: #e8f5e9;    /* Light Mint */
+    --bg-light: #f4f7f4;       /* Background Gray-Green */
+    --white: #ffffff;
+    --text-main: #333333;
+    --text-muted: #777777;
+    --danger: #c0392b;         /* Red for errors/decline */
+    --border: #eeeeee;
+    --shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: var(--bg-light);
+    color: var(--text-main);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+/* =========================================
+   2. LAYOUT: SIDEBAR & CONTENT AREA
+   ========================================= */
+.dashboard-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 260px;
+    background: var(--primary-dark);
+    color: var(--white);
+    position: fixed;
+    height: 100vh;
+    padding-top: 2rem;
+    z-index: 1000;
+}
+
+.sidebar .logo {
+    padding: 0 2rem 2.5rem;
+    font-size: 1.6rem;
+    font-weight: bold;
+}
+
+.sidebar .logo span { 
+    color: var(--primary-light); 
+}
+
+.side-nav a {
+    color: #aec6ab;
+    text-decoration: none;
+    padding: 1.2rem 2rem;
+    display: block;
+    transition: 0.3s ease;
+    border-left: 4px solid transparent;
+}
+
+.side-nav a:hover, 
+.side-nav a.active {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--white);
+    border-left-color: var(--primary-light);
+}
+
+.nav-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 1.5rem 0;
+}
+
+.logout { 
+    color: #ff9999 !important; 
+}
+
+.dashboard-content {
+    flex: 1;
+    margin-left: 260px; /* Same as sidebar width */
+    padding: 2.5rem 5%;
+}
+
+.dash-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+/* =========================================
+   3. COMPONENTS: CARDS & STATS
+   ========================================= */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+}
+
+.stat-card {
+    background: var(--white);
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+}
+
+.stat-card h4 { 
+    color: var(--text-muted); 
+    font-size: 0.85rem; 
+    text-transform: uppercase; 
+}
+
+.stat-card p { 
+    font-size: 1.8rem; 
+    font-weight: bold; 
+    color: var(--primary-dark); 
+    margin-top: 0.5rem; 
+}
+
+.stat-card p span { 
+    font-size: 1rem; 
+    color: var(--text-muted); 
+}
+
+.activity-section {
+    background: var(--white);
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+/* =========================================
+   4. DATA TABLES & TAGS
+   ========================================= */
+.table-responsive { 
+    overflow-x: auto; 
+}
+
+.activity-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.activity-table th {
+    text-align: left;
+    padding: 1.2rem 1rem;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+    font-size: 0.9rem;
+}
+
+.activity-table td {
+    padding: 1.2rem 1rem;
+    border-bottom: 1px solid #f9f9f9;
+    vertical-align: middle;
+}
+
+/* Material Type Badges */
+.material-tag {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    margin-right: 4px;
+}
+
+.plastic { background: #e3f2fd; color: #1976d2; }
+.metal { background: #fff3e0; color: #f57c00; }
+.glass { background: #f3e5f5; color: #7b1fa2; }
+.paper { background: #efebe9; color: #5d4037; }
+
+/* Status Labels */
+.status-verified { color: var(--primary-dark); background: var(--accent-mint); padding: 5px 10px; border-radius: 5px; font-size: 0.8rem; }
+.status-pending { color: #856404; background: #fff3cd; padding: 5px 10px; border-radius: 5px; font-size: 0.8rem; }
+
+/* =========================================
+   5. BUTTONS & INTERACTION
+   ========================================= */
+.btn-primary {
+    background: var(--primary-dark);
+    color: var(--white);
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.3s ease;
+}
+
+.btn-primary:hover { 
+    background: var(--primary-light); 
+    transform: translateY(-1px);
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid #ddd;
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 0.85rem;
+}
+
+.btn-outline:hover { 
+    background: #f5f5f5; 
+    border-color: #999; 
+}
+
+/* Filters */
+.map-filters { 
+    display: flex; 
+    gap: 0.8rem; 
+}
+
+.filter-btn {
+    padding: 0.6rem 1.2rem;
+    border: 1px solid #ddd;
+    background: var(--white);
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: 0.3s;
+}
+
+.filter-btn.active, 
+.filter-btn:hover {
+    background: var(--primary-dark);
+    color: var(--white);
+    border-color: var(--primary-dark);
+}
+
+/* =========================================
+   6. MISC: MAPS, BADGES, REWARDS
+   ========================================= */
+.map-container {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    margin-top: 10px;
+}
+
+.user-badge {
+    background: var(--primary-light);
+    color: white;
+    padding: 0.6rem 1.2rem;
+    border-radius: 30px;
+    font-weight: bold;
+    font-size: 0.85rem;
+}
+
+/* Reward Item Styling (Twin of Activity-Section) */
+.reward-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: 0.3s;
+}
+
+.reward-item:hover { 
+    transform: translateX(8px); 
+    border-left: 5px solid var(--primary-light); 
+}
+
+/* Form Styles for Profile */
+.profile-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--primary-dark);
+}
+
+.profile-form input {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
+
+/* =========================================
+   7. RESPONSIVE MEDIA QUERIES
+   ========================================= */
+@media (max-width: 992px) {
+    .sidebar { width: 80px; padding-top: 1rem; }
+    .sidebar .logo, .side-nav a span { display: none; }
+    .dashboard-content { margin-left: 80px; }
+}
+
+@media (max-width: 768px) {
+    .dash-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+    .stats-grid { grid-template-columns: 1fr; }
+    .section-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+}

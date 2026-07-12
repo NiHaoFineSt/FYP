@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "factory_staff"
+		},
+		{
+			"path": "recycling_staff"
+		},
+		{
+			"path": "user"
+		}
+	]
+}

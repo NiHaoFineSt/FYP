@@ -34,26 +34,42 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_pin'])) {
         if ($result->num_rows > 0) {
             $row = $result->fetch_assoc();
             $timbangan_id = $row['id'];
-            $berat = $row['berat_g'];
+            
+            // PEMBERSIHAN DATA BERAT (Diambil dari ESP32 dalam unit GRAM)
+            $raw_berat = preg_replace('/[^0-9.]/', '', $row['berat_g']);
+            $berat_gram = floatval($raw_berat); 
 
             // Formula ganjaran (1 gram berat = 1 mata ganjaran)
-            $points_earned = floor($berat); 
+            $points_earned = floor($berat_gram); 
 
             // 2. Kemas kini status PIN kepada 'Dah Dituntut'
             $update_stmt = $conn->prepare("UPDATE timbangan SET status = 'Dah Dituntut' WHERE id = ?");
             $update_stmt->bind_param("i", $timbangan_id);
             
             if ($update_stmt->execute()) {
-                // SEPADAN DATABASE SEBENAR: Kemas kini kolum 'points' dan 'total_points' serentak
+                // 3. Kemas kini kolum 'points' dan 'total_points' pengguna
                 $points_stmt = $conn->prepare("UPDATE users SET points = points + ?, total_points = total_points + ? WHERE user_id = ?");
                 $points_stmt->bind_param("iii", $points_earned, $points_earned, $user_id);
                 $points_stmt->execute();
 
-                // Mesej kejayaan dalam Bahasa Inggeris
-                $mesej = "🎉 Point has been claimed successfully! (+$points_earned Points)";
+                // 4. MASUKKAN REKOD KE TRANSACTIONS
+                // Tukar Gram dari ESP32 ke KG untuk paparan My Recycling (cth: 500g -> 0.50 kg)
+                $weight_kg = floatval(number_format($berat_gram / 1000, 2, '.', '')); 
+                
+                // Setkan jenis bahan secara khusus kepada Plastic
+                $material_type = "Plastic"; 
+                $hub_location = "Smart Bin Kiosk";  
+                $status_trx = "Claimed";            
+
+                $trx_stmt = $conn->prepare("INSERT INTO transactions (user_id, material_type, weight, points, hub_location, status, date) VALUES (?, ?, ?, ?, ?, ?, NOW())");
+                $trx_stmt->bind_param("isdiss", $user_id, $material_type, $weight_kg, $points_earned, $hub_location, $status_trx);
+                $trx_stmt->execute();
+
+                // Mesej kejayaan
+                $mesej = "🎉 Point has been claimed successfully! (+$points_earned Points | $weight_kg kg Plastic)";
                 $status_mesej = "success";
 
-                // Refresh nilai mata ganjaran pada skrin selepas penambahan sukses
+                // Refresh nilai mata ganjaran pada skrin
                 $user_query->execute();
                 $user_result = $user_query->get_result()->fetch_assoc();
                 $current_points = $user_result['points'];

@@ -9,15 +9,74 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'user') {
 }
 
 $user_id = $_SESSION['user_id'];
+$mesej = "";
+$status_mesej = "";
 
-// FETCH UPDATED USER DATA (Points balance)
-$query = "SELECT name, total_points FROM users WHERE user_id = ?";
+// ==========================================
+// PROSES PENEBUSAN REWARD (REDEEM ACTION)
+// ==========================================
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['redeem_reward'])) {
+    $reward_name = $_POST['reward_name'];
+    $cost = intval($_POST['reward_cost']);
+
+    // 1. Dapatkan mata ganjaran semasa pengguna
+    $check_stmt = $conn->prepare("SELECT points FROM users WHERE user_id = ?");
+    $check_stmt->bind_param("i", $user_id);
+    $check_stmt->execute();
+    $user_data = $check_stmt->get_result()->fetch_assoc();
+    $user_points = isset($user_data['points']) ? $user_data['points'] : 0;
+
+    // 2. Semak jika mata ganjaran mencukupi
+    if ($user_points >= $cost) {
+        // Tolak mata ganjaran dari jadual users
+        $update_stmt = $conn->prepare("UPDATE users SET points = points - ? WHERE user_id = ?");
+        $update_stmt->bind_param("ii", $cost, $user_id);
+
+        if ($update_stmt->execute()) {
+            // Rekodkan transaksi penebusan ke dalam pangkalan data
+            // Nota: Jika anda belum ada jadual rewards_claimed, buat jadual asas atau simpan ke transactions
+            $log_stmt = $conn->prepare("INSERT INTO rewards_claimed (user_id, reward_name, points_spent, claimed_at) VALUES (?, ?, ?, NOW())");
+            
+            // Sekiranya anda menggunakan jadual 'transactions' sedia ada, tukar query di atas mengikut struktur anda.
+            if ($log_stmt) {
+                $log_stmt->bind_param("isi", $user_id, $reward_name, $cost);
+                $log_stmt->execute();
+            }
+
+            $mesej = "🎉 Successfully redeemed " . htmlspecialchars($reward_name) . "!";
+            $status_mesej = "success";
+        } else {
+            $mesej = "⚠️ Failed to process redemption. Please try again.";
+            $status_mesej = "error";
+        }
+    } else {
+        $mesej = "❌ You do not have enough points for this reward.";
+        $status_mesej = "error";
+    }
+}
+
+// ==========================================
+// AMBIL DATA PENGGUNA & STATISTIK
+// ==========================================
+// 1. Baki mata ganjaran & Jumlah Terkumpul (Total Earned)
+$query = "SELECT name, points, total_points FROM users WHERE user_id = ?";
 $stmt = $conn->prepare($query);
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $userData = $stmt->get_result()->fetch_assoc();
 
-$current_points = $userData['total_points'];
+$current_points = isset($userData['points']) ? $userData['points'] : 0;
+$lifetime_points = isset($userData['total_points']) ? $userData['total_points'] : $current_points;
+
+// 2. Kira jumlah ganjaran yang telah ditebus (Rewards Claimed)
+$claim_count = 0;
+$count_stmt = $conn->prepare("SELECT COUNT(*) AS total_claimed FROM rewards_claimed WHERE user_id = ?");
+if ($count_stmt) {
+    $count_stmt->bind_param("i", $user_id);
+    $count_stmt->execute();
+    $count_result = $count_stmt->get_result()->fetch_assoc();
+    $claim_count = $count_result['total_claimed'];
+}
 ?>
 
 <!DOCTYPE html>
@@ -28,7 +87,9 @@ $current_points = $userData['total_points'];
     <title>Redeem Rewards | RecycleHub</title>
     <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="reward.css">
-    <link rel="stylesheet" href="citizen dashboard.css"> </head>
+    <link rel="stylesheet" href="citizen dashboard.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
 <body>
 
     <div class="dashboard-wrapper">
@@ -45,7 +106,7 @@ $current_points = $userData['total_points'];
                 <a href="myrecycing.php">My Recycling</a>
                 <a href="dropoff.php">Drop-off Points</a>
                 <a href="customerqr.php">My QR Code</a>
-                <a href="userscan.php">Scan QR</a>
+                <a href="userscan.php">Claim Code</a>
                 <a href="reward.php" class="active">Rewards</a>
                 <a href="Profilepage.php">Profile</a>
                 <div class="nav-divider"></div>
@@ -62,6 +123,13 @@ $current_points = $userData['total_points'];
                 <div class="user-badge"><?php echo number_format($current_points); ?> Points Available</div>
             </header>
 
+            <!-- NOTIFIKASI MESEJ -->
+            <?php if (!empty($mesej)): ?>
+                <div style="padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: bold; background: <?php echo ($status_mesej == 'success') ? '#e8f5e9' : '#ffebee'; ?>; color: <?php echo ($status_mesej == 'success') ? '#2d5a27' : '#c62828'; ?>;">
+                    <?php echo $mesej; ?>
+                </div>
+            <?php endif; ?>
+
             <section class="stats-grid">
                 <div class="stat-card">
                     <h4>Your Balance</h4>
@@ -69,11 +137,11 @@ $current_points = $userData['total_points'];
                 </div>
                 <div class="stat-card">
                     <h4>Lifetime Earned</h4>
-                    <p><?php echo number_format($current_points + 500); ?> <span>pts</span></p>
+                    <p><?php echo number_format($lifetime_points); ?> <span>pts</span></p>
                 </div>
                 <div class="stat-card">
                     <h4>Rewards Claimed</h4>
-                    <p>0</p>
+                    <p><?php echo $claim_count; ?></p> <!-- ANGKA DINAMIK -->
                 </div>
             </section>
 
@@ -88,60 +156,85 @@ $current_points = $userData['total_points'];
 
             <section class="rewards-container">
                 
-                <?php $cost1 = 500; ?>
+                <!-- REWARD 1 -->
+                <?php 
+                    $name1 = "$5 Grocery Voucher";
+                    $cost1 = 500; 
+                ?>
                 <div class="activity-section reward-item <?php echo ($current_points < $cost1) ? 'locked' : ''; ?>">
                     <div class="reward-content">
                         <div class="reward-icon">🎫</div>
                         <div class="reward-details">
-                            <h4>$5 Grocery Voucher</h4>
+                            <h4><?php echo $name1; ?></h4>
                             <p>Get a discount on your next purchase at EcoMart.</p>
                             <span class="points-cost"><?php echo $cost1; ?> Points</span>
                         </div>
                     </div>
-                    <?php if ($current_points >= $cost1): ?>
-                        <button class="btn-primary">Redeem Now</button>
-                    <?php else: ?>
-                        <button class="btn-primary" style="background: #ccc; cursor: not-allowed;" disabled>Not Enough Points</button>
-                    <?php endif; ?>
+                    <form method="POST" action="">
+                        <input type="hidden" name="reward_name" value="<?php echo $name1; ?>">
+                        <input type="hidden" name="reward_cost" value="<?php echo $cost1; ?>">
+                        <?php if ($current_points >= $cost1): ?>
+                            <button type="submit" name="redeem_reward" class="btn-primary">Redeem Now</button>
+                        <?php else: ?>
+                            <button type="button" class="btn-primary" style="background: #ccc; cursor: not-allowed;" disabled>Not Enough Points</button>
+                        <?php endif; ?>
+                    </form>
                 </div>
 
-                <?php $cost2 = 800; ?>
+                <!-- REWARD 2 -->
+                <?php 
+                    $name2 = "Reusable Bamboo Cup";
+                    $cost2 = 800; 
+                ?>
                 <div class="activity-section reward-item <?php echo ($current_points < $cost2) ? 'locked' : ''; ?>">
                     <div class="reward-content">
                         <div class="reward-icon">🥤</div>
                         <div class="reward-details">
-                            <h4>Reusable Bamboo Cup</h4>
+                            <h4><?php echo $name2; ?></h4>
                             <p>Pick up at any Downtown CRC location.</p>
                             <span class="points-cost"><?php echo $cost2; ?> Points</span>
                         </div>
                     </div>
-                    <?php if ($current_points >= $cost2): ?>
-                        <button class="btn-primary">Redeem Now</button>
-                    <?php else: ?>
-                        <button class="btn-primary" style="background: #ccc; cursor: not-allowed;" disabled>Not Enough Points</button>
-                    <?php endif; ?>
+                    <form method="POST" action="">
+                        <input type="hidden" name="reward_name" value="<?php echo $name2; ?>">
+                        <input type="hidden" name="reward_cost" value="<?php echo $cost2; ?>">
+                        <?php if ($current_points >= $cost2): ?>
+                            <button type="submit" name="redeem_reward" class="btn-primary">Redeem Now</button>
+                        <?php else: ?>
+                            <button type="button" class="btn-primary" style="background: #ccc; cursor: not-allowed;" disabled>Not Enough Points</button>
+                        <?php endif; ?>
+                    </form>
                 </div>
 
-                <?php $cost3 = 2500; ?>
+                <!-- REWARD 3 -->
+                <?php 
+                    $name3 = "Electric Scooter Rental";
+                    $cost3 = 2500; 
+                ?>
                 <div class="activity-section reward-item <?php echo ($current_points < $cost3) ? 'locked' : ''; ?>">
                     <div class="reward-content">
                         <div class="reward-icon">🚲</div>
                         <div class="reward-details">
-                            <h4>Electric Scooter Rental</h4>
+                            <h4><?php echo $name3; ?></h4>
                             <p>1 Full day of eco-friendly commuting.</p>
                             <span class="points-cost"><?php echo $cost3; ?> Points</span>
                         </div>
                     </div>
-                    <?php if ($current_points >= $cost3): ?>
-                        <button class="btn-primary">Redeem Now</button>
-                    <?php else: ?>
-                        <button class="btn-primary" style="background: #ccc; cursor: not-allowed;" disabled>Not Enough Points</button>
-                    <?php endif; ?>
+                    <form method="POST" action="">
+                        <input type="hidden" name="reward_name" value="<?php echo $name3; ?>">
+                        <input type="hidden" name="reward_cost" value="<?php echo $cost3; ?>">
+                        <?php if ($current_points >= $cost3): ?>
+                            <button type="submit" name="redeem_reward" class="btn-primary">Redeem Now</button>
+                        <?php else: ?>
+                            <button type="button" class="btn-primary" style="background: #ccc; cursor: not-allowed;" disabled>Not Enough Points</button>
+                        <?php endif; ?>
+                    </form>
                 </div>
 
             </section>
         </main>
     </div>
+
     <script>
         window.onload = function() {
             var userId = "<?php echo $user_id; ?>";
@@ -160,4 +253,3 @@ $current_points = $userData['total_points'];
 
 </body>
 </html>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>

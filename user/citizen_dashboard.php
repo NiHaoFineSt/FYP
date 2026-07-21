@@ -11,15 +11,23 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'user') {
 
 $user_id = $_SESSION['user_id'];
 
-// 2. FETCH LIVE USER DATA (Totals from 'users' table)
-$query = "SELECT name, total_kg, total_points FROM users WHERE user_id = ?";
+// 2. FETCH LIVE USER DATA (Name & Points)
+$query = "SELECT name, points, total_points FROM users WHERE user_id = ?";
 $stmt = $conn->prepare($query);
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $userData = $stmt->get_result()->fetch_assoc();
 
-// 3. GENERATE QR CODE URL (For the sidebar)
-$qrCodeUrl = "https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=" . $user_id . "&choe=UTF-8";
+// 3. KIRA JUMLAH BERAT (TOTAL RECYCLED IN KG) TERUS DARI TRANSACTIONS
+$sumQuery = "SELECT SUM(weight) AS total_recycled_kg FROM transactions WHERE user_id = ?";
+$sumStmt = $conn->prepare($sumQuery);
+$sumStmt->bind_param("i", $user_id);
+$sumStmt->execute();
+$sumResult = $sumStmt->get_result()->fetch_assoc();
+
+// Jika belum ada sebarang transaksi, tetapkan 0
+$total_recycled_kg = isset($sumResult['total_recycled_kg']) && $sumResult['total_recycled_kg'] !== null ? $sumResult['total_recycled_kg'] : 0;
+$current_points = isset($userData['points']) ? $userData['points'] : 0;
 ?>
 
 <!DOCTYPE html>
@@ -30,6 +38,7 @@ $qrCodeUrl = "https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=" . $use
     <title>Citizen Dashboard | RecycleHub</title>
     <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="citizen dashboard.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
 
@@ -48,7 +57,7 @@ $qrCodeUrl = "https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=" . $use
                 <a href="myrecycing.php">My Recycling</a>
                 <a href="dropoff.php">Drop-off Points</a>
                 <a href="customerqr.php">My QR Code</a>
-                <a href="userscan.php">Scan QR</a>
+                <a href="userscan.php">Claim Code</a>
                 <a href="reward.php">Rewards</a>
                 <a href="Profilepage.php">Profile</a>
                 <div class="nav-divider"></div>
@@ -66,13 +75,16 @@ $qrCodeUrl = "https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=" . $use
             </header>
 
             <section class="stats-grid">
+                <!-- STAT CARD 1: TOTAL RECYCLED (KG) -->
                 <div class="stat-card">
                     <h4>Total Recycled</h4>
-                    <p><?php echo number_format($userData['total_kg'], 1); ?> <span>kg</span></p>
+                    <p><?php echo number_format($total_recycled_kg, 2); ?> <span>kg</span></p>
                 </div>
+                
+                <!-- STAT CARD 2: HUB POINTS (PTS) -->
                 <div class="stat-card">
                     <h4>Hub Points</h4>
-                    <p><?php echo number_format($userData['total_points']); ?> <span>pts</span></p>
+                    <p><?php echo number_format($current_points); ?> <span>pts</span></p>
                 </div>
             </section>
 
@@ -107,7 +119,7 @@ $qrCodeUrl = "https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=" . $use
                                     echo "<tr>";
                                     echo "<td>" . date('d M Y', strtotime($row['date'])) . "</td>";
                                     echo "<td><div class='material-tag plastic'>" . htmlspecialchars($row['material_type']) . "</div></td>";
-                                    echo "<td>" . $row['weight'] . " kg</td>";
+                                    echo "<td>" . number_format($row['weight'], 2) . " kg</td>";
                                     echo "<td>+" . $row['points'] . "</td>";
                                     echo "<td><span class='status-verified'>" . $row['status'] . "</span></td>";
                                     echo "</tr>";
@@ -124,15 +136,20 @@ $qrCodeUrl = "https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=" . $use
     </div>
     
     <script>
-        // Generate QR code in the sidebar
-        new QRCode(document.getElementById("sidebar-qrcode"), {
-            text: "<?php echo $user_id; ?>",
-            width: 150,
-            height: 150,
-            colorDark : "#000000",
-            colorLight : "#ffffff",
-            correctLevel : QRCode.CorrectLevel.H
-        });
+        window.onload = function() {
+            var userId = "<?php echo $user_id; ?>";
+            var qrElement = document.getElementById("sidebar-qrcode");
+            if (qrElement) {
+                new QRCode(qrElement, {
+                    text: userId,
+                    width: 85,
+                    height: 85,
+                    colorDark : "#2d5a27",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
+            }
+        };
+    </script>
 </body>
 </html>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>

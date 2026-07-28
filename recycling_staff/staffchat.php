@@ -55,8 +55,8 @@ if ($active_recipient_id) {
                 <a href="../inventorylog.php">Inventory Log</a>
                 <a href="staffscan.php">Scan QR</a>
                 <a href="factory.php">Factory Recs</a>
-                <a href="staffchat.php" class="active">Staff Chat</a>
-                <a href="staffprofile.php">Profile</a>
+                <a href="../staffchat.php" class="active">Staff Chat</a>
+                <a href="../staffprofile.php">Profile</a>
                 <div class="nav-divider"></div>
                 <a href="../logout.php" class="logout">Logout</a>
             </nav>

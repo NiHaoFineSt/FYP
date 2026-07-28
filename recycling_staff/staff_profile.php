@@ -55,7 +55,7 @@ $initials = strtoupper(substr($first_name, 0, 1) . substr($last_name, 0, 1));
                 <a href="staffscan.php">Scan QR</a>
                 <a href="factory.php">Factory Recs</a>
                 <a href="staffchat.php">Staff Chat</a>
-                <a href="staffprofile.php" class="active">Profile</a>
+                <a href="staff_profile.php" class="active">Profile</a>
                 <div class="nav-divider"></div>
                 <a href="logout.php" class="logout">Logout</a>
             </nav>

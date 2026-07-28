@@ -29,7 +29,7 @@ $initials = strtoupper(substr($words[0], 0, 1) . (isset($words[1]) ? substr($wor
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Profile | RecycleHub</title>
     <link rel="stylesheet" href="../style.css">
-    <link rel="stylesheet" href="citizen dashboard.css"> 
+    <link rel="stylesheet" href="citizen_dashboard.css"> 
     <link rel="stylesheet" href="profilepage.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>

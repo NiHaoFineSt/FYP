@@ -9,7 +9,7 @@
     --white: #ffffff;
     --text-main: #333333;
     --text-muted: #777777;
-    --danger: #c0392b;         /* Red for errors/decline */
+    --danger: #ff6b6b;         /* Red for Logout / Errors */
     --border: #eeeeee;
     --shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
@@ -36,32 +36,45 @@ body {
     min-height: 100vh;
 }
 
+/* Sidebar Navigation Flexbox */
 .sidebar {
     width: 260px;
     background: var(--primary-dark);
     color: var(--white);
     position: fixed;
+    top: 0;
+    left: 0;
     height: 100vh;
-    padding-top: 2rem;
+    padding-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
     z-index: 1000;
 }
 
 .sidebar .logo {
-    padding: 0 2rem 2.5rem;
+    padding: 0 2rem 1.5rem;
     font-size: 1.6rem;
     font-weight: bold;
+    text-align: center;
 }
 
 .sidebar .logo span { 
     color: var(--primary-light); 
 }
 
+.side-nav {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* Fills remaining height */
+}
+
 .side-nav a {
     color: #aec6ab;
     text-decoration: none;
-    padding: 1.2rem 2rem;
+    padding: 0.9rem 1.8rem;
     display: block;
-    transition: 0.3s ease;
+    transition: 0.2s ease;
     border-left: 4px solid transparent;
 }
 
@@ -72,19 +85,30 @@ body {
     border-left-color: var(--primary-light);
 }
 
+/* LOGOUT BUTTON FIX */
 .nav-divider {
+    margin-top: auto; /* Crucial: Pushes logout link to the bottom */
     height: 1px;
-    background: rgba(255, 255, 255, 0.1);
-    margin: 1.5rem 0;
+    background: rgba(255, 255, 255, 0.15);
+    margin-bottom: 0.5rem;
 }
 
-.logout { 
-    color: #ff9999 !important; 
+.side-nav a.logout { 
+    color: var(--danger) !important;
+    font-weight: bold;
+    padding: 0.9rem 1.8rem;
+    display: block;
 }
 
+.side-nav a.logout:hover {
+    background: rgba(255, 107, 107, 0.15);
+    border-left-color: var(--danger);
+}
+
+/* Main Content Area */
 .dashboard-content {
     flex: 1;
-    margin-left: 260px; /* Same as sidebar width */
+    margin-left: 260px; /* Matches sidebar width */
     padding: 2.5rem 5%;
 }
 
@@ -248,7 +272,7 @@ body {
 }
 
 /* =========================================
-   6. MISC: MAPS, BADGES, REWARDS
+   6. MISC: MAPS, BADGES, REWARDS, QR CODE
    ========================================= */
 .map-container {
     border-radius: 12px;
@@ -266,7 +290,7 @@ body {
     font-size: 0.85rem;
 }
 
-/* Reward Item Styling (Twin of Activity-Section) */
+/* Reward Item Styling */
 .reward-item {
     display: flex;
     justify-content: space-between;
@@ -277,6 +301,50 @@ body {
 .reward-item:hover { 
     transform: translateX(8px); 
     border-left: 5px solid var(--primary-light); 
+}
+
+/* QR Code Display Container */
+.qr-display-container {
+    max-width: 500px;
+    margin: 0 auto;
+    background: var(--white);
+    padding: 30px;
+    border-radius: 15px;
+    border: 1px solid var(--border);
+    text-align: center;
+    box-shadow: var(--shadow);
+}
+
+#qrcode-box {
+    display: inline-block;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 20px;
+    margin-bottom: 15px;
+}
+
+#qrcode img {
+    margin: 0 auto;
+    border: 5px solid var(--white);
+    border-radius: 10px;
+}
+
+.user-id-text {
+    font-size: 1.2rem;
+    color: var(--text-main);
+    margin: 10px 0 5px 0;
+    font-weight: bold;
+}
+
+.hint-text {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.qr-meta {
+    border-top: 1px solid var(--border);
+    margin-top: 20px;
+    padding-top: 15px;
 }
 
 /* Form Styles for Profile */

@@ -1,4 +1,106 @@
-/* QR Specific Layout */
+/* Color Palette Variables */
+:root {
+    --primary-dark: #2d5a27;
+    --primary-light: #68b04d;
+    --white: #ffffff;
+    --text-muted: #aec6ab;
+    --bg-light: #f4f6f8;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-light);
+}
+
+/* Layout Core */
+.dashboard-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar Navigation Core */
+.sidebar {
+    width: 260px;
+    background: var(--primary-dark);
+    color: var(--white);
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    padding-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    z-index: 100;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 1rem;
+    color: var(--white);
+}
+
+.logo span {
+    color: var(--primary-light);
+}
+
+.side-nav {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.side-nav a {
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 0.9rem 1.8rem;
+    display: block;
+    border-left: 4px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.side-nav a.active, 
+.side-nav a:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--white);
+    border-left-color: var(--primary-light);
+}
+
+/* Logout Button & Divider Fix */
+.nav-divider {
+    margin-top: auto; /* Crucial: Pushes logout link to the bottom */
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    margin-bottom: 0.5rem;
+}
+
+.side-nav a.logout {
+    color: #ff6b6b;
+    font-weight: bold;
+}
+
+.side-nav a.logout:hover {
+    background: rgba(255, 107, 107, 0.15);
+    border-left-color: #ff6b6b;
+}
+
+/* Main Content Area Offset */
+.dashboard-content {
+    flex: 1;
+    margin-left: 260px;
+    padding: 2rem 4%;
+}
+
+/* ==========================================
+   QR Specific Layout
+   ========================================== */
 .qr-display-container {
     max-width: 500px;
     margin: 0 auto;
@@ -6,6 +108,7 @@
     padding: 30px;
     border-radius: 15px;
     border: 1px solid #eee;
+    text-align: center;
 }
 
 #qrcode-box {
@@ -26,6 +129,7 @@
     font-size: 1.2rem;
     color: #333;
     margin: 10px 0 5px 0;
+    font-weight: bold;
 }
 
 .hint-text {
@@ -38,11 +142,4 @@
     border-top: 1px solid #f0f0f0;
     margin-top: 20px;
     padding-top: 15px;
-}
-
-/* Ensure the sidebar active state matches the theme */
-.side-nav a.active {
-    background: #e8f5e9;
-    color: #2d5a27;
-    border-left: 4px solid #68b04d;
 }

@@ -4,18 +4,14 @@
       "runtime": "vercel-php@0.7.3"
     }
   },
-  "routes": [
+  "rewrites": [
     {
-      "src": "/(.*\\.css)",
-      "dest": "/$1"
+      "source": "/recycling_staff/:path*",
+      "destination": "/api/recycling_staff/:path*"
     },
     {
-      "src": "/(.*\\.js)",
-      "dest": "/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/api/$1"
+      "source": "/:path*",
+      "destination": "/api/:path*"
     }
   ]
 }

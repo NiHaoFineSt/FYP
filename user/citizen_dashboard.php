@@ -1,7 +1,6 @@
 <?php
 session_start();
-
-// Use __DIR__ for reliable path resolution on Vercel
+// Use '../' because this file is inside the 'user' folder
 include __DIR__ . '/../config.php'; 
 
 // 1. SECURITY CHECK: Ensure user is logged in
@@ -37,14 +36,13 @@ $current_points = isset($userData['points']) ? $userData['points'] : 0;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Citizen Dashboard | RecycleHub</title>
-    <!-- Root-relative CSS pathing -->
     <link rel="stylesheet" href="/user/citizen_dashboard.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
 
     <div class="dashboard-wrapper">
-        <aside class="sidebar" style="display: flex; flex-direction: column; min-height: 100vh;">
+        <aside class="sidebar">
             <div class="logo">Recycle<span>Hub</span></div>
             
             <div class="user-profile-side" style="padding: 20px; text-align: center;">
@@ -53,8 +51,7 @@ $current_points = isset($userData['points']) ? $userData['points'] : 0;
                 </div>
                 <p style="color: white;">ID: #<?php echo $user_id; ?></p>
             </div>
-            
-            <nav class="side-nav" style="display: flex; flex-direction: column; flex-grow: 1;">
+            <nav class="side-nav">
                 <a href="citizen_dashboard.php" class="active">Overview</a>
                 <a href="myrecycing.php">My Recycling</a>
                 <a href="dropoff.php">Drop-off Points</a>
@@ -62,17 +59,15 @@ $current_points = isset($userData['points']) ? $userData['points'] : 0;
                 <a href="userscan.php">Claim Code</a>
                 <a href="reward.php">Rewards</a>
                 <a href="Profilepage.php">Profile</a>
-                
-                <!-- Pushes logout link neatly to the bottom of the navigation flexbox -->
-                <div class="nav-divider" style="margin-top: auto; border-top: 1px solid rgba(255, 255, 255, 0.2); margin-bottom: 10px;"></div>
-                <a href="../logout.php" class="logout" style="color: #ff6b6b; font-weight: bold; padding: 12px 20px; display: block; text-decoration: none;">Logout</a>
+                <div class="nav-divider"></div>
+                <a href="../logout.php" class="logout">Logout</a>
             </nav>
         </aside>
 
         <main class="dashboard-content">
             <header class="dash-header">
                 <div>
-                    <h2>Hello, <?php echo htmlspecialchars($userData['name'] ?? 'User'); ?>!</h2>
+                    <h2>Hello, <?php echo htmlspecialchars($userData['name']); ?>!</h2>
                     <p>Track your impact and find nearby hubs.</p>
                 </div>
                 <div class="user-badge">Eco-Warrior</div>
@@ -125,7 +120,7 @@ $current_points = isset($userData['points']) ? $userData['points'] : 0;
                                     echo "<td><div class='material-tag plastic'>" . htmlspecialchars($row['material_type']) . "</div></td>";
                                     echo "<td>" . number_format($row['weight'], 2) . " kg</td>";
                                     echo "<td>+" . $row['points'] . "</td>";
-                                    echo "<td><span class='status-verified'>" . htmlspecialchars($row['status']) . "</span></td>";
+                                    echo "<td><span class='status-verified'>" . $row['status'] . "</span></td>";
                                     echo "</tr>";
                                 }
                             } else {

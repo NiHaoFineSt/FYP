@@ -37,7 +37,7 @@ $current_points = isset($userData['points']) ? $userData['points'] : 0;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Citizen Dashboard | RecycleHub</title>
     <link rel="stylesheet" href="../style.css">
-    <link rel="stylesheet" href="citizen dashboard.css">
+    <link rel="stylesheet" href="/user/citizen dashboard.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>

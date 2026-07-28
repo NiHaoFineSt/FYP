@@ -1,25 +1,19 @@
 {
-  "functions": {
-    "api/**/*.php": {
-      "runtime": "vercel-php@0.7.3"
+  "version": 2,
+  "builds": [
+    {
+      "src": "**/*.php",
+      "use": "vercel-php@0.7.3"
+    },
+    {
+      "src": "**/*.{css,js,png,jpg,svg,jpeg,ico}",
+      "use": "@vercel/static"
     }
-  },
+  ],
   "routes": [
     {
-      "src": "/(.*\\.css)",
-      "dest": "/$1"
-    },
-    {
-      "src": "/(.*\\.js)",
-      "dest": "/$1"
-    },
-    {
-      "src": "/recycling_staff/(.*)",
-      "dest": "/api/recycling_staff/$1"
-    },
-    {
       "src": "/(.*)",
-      "dest": "/api/index.php"
+      "dest": "/$1"
     }
   ]
 }

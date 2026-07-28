@@ -43,10 +43,9 @@ $global_rank = $rankResult['user_rank'];
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My QR Code | RecycleHub</title>
-    <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="myrecycing.css"> 
     <link rel="stylesheet" href="customerqr.css"> 
-    <link rel="stylesheet" href="citizen dashboard.css"> 
+    <link rel="stylesheet" href="citizen_dashboard.css"> 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>

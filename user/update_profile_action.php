@@ -1,6 +1,6 @@
 <?php
 session_start();
-include('../config.php');
+include __DIR__ . '/../config.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['user_id'])) {
     $uid = $_SESSION['user_id'];

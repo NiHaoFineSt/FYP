@@ -1,6 +1,6 @@
 <?php
 session_start();
-include('../config.php');
+include __DIR__ . '/../config.php';
 
 // 1. SECURITY: Ensure user is logged in
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'user') {

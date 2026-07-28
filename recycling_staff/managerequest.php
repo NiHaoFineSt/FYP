@@ -36,7 +36,7 @@ $waiting_count = $count_res->fetch_assoc()['total'] ?? 0;
                 <a href="staffscan.php">Scan QR</a>
                 <a href="factory.php">Factory</a>
                 <a href="staffchat.php">Staff Chat</a>
-                <a href="staffprofile.php">Profile</a>
+                <a href="../staffprofile.php">Profile</a>
                 <div class="nav-divider"></div>
                 <a href="../logout.php" class="logout">Logout</a>
             </nav>

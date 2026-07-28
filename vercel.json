@@ -1,12 +1,6 @@
 {
   "functions": {
-    "api/*.php": {
-      "runtime": "vercel-php@0.7.3"
-    },
-    "*.php": {
-      "runtime": "vercel-php@0.7.3"
-    },
-    "**/*.php": {
+    "api/**/*.php": {
       "runtime": "vercel-php@0.7.3"
     }
   },
@@ -20,8 +14,12 @@
       "dest": "/$1"
     },
     {
+      "src": "/recycling_staff/(.*)",
+      "dest": "/api/recycling_staff/$1"
+    },
+    {
       "src": "/(.*)",
-      "dest": "/$1"
+      "dest": "/api/index.php"
     }
   ]
 }

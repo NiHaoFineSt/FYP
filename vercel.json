@@ -2,16 +2,15 @@
   "functions": {
     "api/**/*.php": {
       "runtime": "vercel-php@0.7.3"
+    },
+    "*.php": {
+      "runtime": "vercel-php@0.7.3"
     }
   },
-  "rewrites": [
+  "routes": [
     {
-      "source": "/recycling_staff/:path*",
-      "destination": "/api/recycling_staff/:path*"
-    },
-    {
-      "source": "/:path*",
-      "destination": "/api/:path*"
+      "src": "/(.*)",
+      "dest": "/index.php"
     }
   ]
 }

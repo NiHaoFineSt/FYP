@@ -1,6 +1,6 @@
 <?php
 session_start();
-include('../config.php');; 
+require_once __DIR__ . '/../config.php';
 
 // 1. SECURITY: Ensure only staff can access
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'recycling staff') {

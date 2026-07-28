@@ -1,7 +1,7 @@
 <?php
 session_start();
 // Use '../' because this file is inside the 'user' folder
-include '../config.php'; 
+include('../config.php'); 
 
 // 1. SECURITY CHECK: Ensure user is logged in
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'user') {

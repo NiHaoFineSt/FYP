@@ -1,7 +1,7 @@
 <?php
 session_start();
 // Include config from the same directory to fix "Failed to open stream" error
-include 'config.php'; 
+include('../config.php'); 
 
 // SECURITY: Only allow logged-in 'admin'
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {

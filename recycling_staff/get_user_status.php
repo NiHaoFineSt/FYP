@@ -1,5 +1,5 @@
 <?php
-include '../config.php'; // Path to main folder
+include('../config.php'); // Path to main folder
 header('Content-Type: application/json');
 
 if (isset($_GET['id'])) {

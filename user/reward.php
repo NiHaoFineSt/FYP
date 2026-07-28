@@ -1,6 +1,6 @@
 <?php
 session_start();
-include '../config.php'; 
+include('../config.php'); 
 
 // SECURITY CHECK
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'user') {

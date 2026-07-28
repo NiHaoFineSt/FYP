@@ -1,7 +1,7 @@
 <?php
 session_start();
 // Go up one level to find config.php from the 'user' folder
-include '../config.php'; 
+include('../config.php'); 
 
 // 1. SECURITY CHECK: Only allow logged-in 'user' role
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'user') {

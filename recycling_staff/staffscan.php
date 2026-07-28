@@ -1,6 +1,6 @@
 <?php
 session_start();
-include '../config.php'; 
+include('../config.php'); 
 
 // 1. FIXED SECURITY: Check for 'recycling staff' role, not 'citizen'
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'recycling staff') {

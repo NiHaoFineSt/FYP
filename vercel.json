@@ -1,6 +1,6 @@
 {
   "functions": {
-    "api/**/*.php": {
+    "api/*.php": {
       "runtime": "vercel-php@0.7.3"
     },
     "*.php": {
@@ -8,14 +8,6 @@
     }
   },
   "routes": [
-    {
-      "src": "/(.*?)\\.(css|js|png|jpg|jpeg|gif|svg|ico|json)$",
-      "dest": "/$1.$2"
-    },
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
     {
       "src": "/(.*)",
       "dest": "/$1"

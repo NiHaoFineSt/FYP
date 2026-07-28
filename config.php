@@ -3,7 +3,7 @@
 $host = getenv('DB_HOST') ?: $_ENV['DB_HOST'] ?? 'recyclehub-db-syafiqahfarhana718-e57b.b.aivencloud.com';
 $user = getenv('DB_USER') ?: $_ENV['DB_USER'] ?? 'avnadmin';
 $pass = getenv('DB_PASS') ?: $_ENV['DB_PASS'] ?? 'YOUR_AIVEN_PASSWORD'; 
-$db   = getenv('DB_NAME') ?: $_ENV['DB_NAME'] ?? 'defaultdb';
+$db = getenv('DB_NAME') ?: $_ENV['DB_NAME'] ?? 'recycling_system';
 $port = getenv('DB_PORT') ?: $_ENV['DB_PORT'] ?? 12827;
 
 // Initialize mysqli

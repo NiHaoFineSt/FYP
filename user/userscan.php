@@ -94,8 +94,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_pin'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Claim Code | RecycleHub</title>
-    <link rel="stylesheet" href="../style.css">
-    <link rel="stylesheet" href="citizen dashboard.css">
+    <link rel="stylesheet" href="citizen_dashboard.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>

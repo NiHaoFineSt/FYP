@@ -53,7 +53,7 @@ $fill_percent = min(100, round(($current_capacity / $max_capacity) * 100, 1));
 $status_badge = "NORMAL";
 $badge_class = "status-badge";
 
-if ($fill_percent >= 85) {
+if ($fill_percent >= 85 && $fill_percent < 100) {
     $status_badge = "HIGH LOAD";
     $badge_class .= " high-load";
 } elseif ($fill_percent >= 100) {
@@ -76,7 +76,11 @@ $pending_result = $conn->query($pending_query);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Factory Command Center | RecycleHub</title>
-    <link rel="stylesheet" href="factorystaff.css">
+    
+    <!-- Link to local folder CSS as well as global fallback styles -->
+    <link rel="stylesheet" href="factorystaff.css?v=<?= time(); ?>">
+    <link rel="stylesheet" href="../style.css">
+    
     <style>
         .actions form {
             display: inline-block;

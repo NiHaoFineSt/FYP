@@ -18,7 +18,7 @@ if (isset($_POST['deposit_submit'])) {
     $material = mysqli_real_escape_string($conn, $_POST['material_type']);
     
     // Points Calculation: 10 points per 1kg
-    $points = floor($weight * 10);
+    $points = floor($weight * 100);
 
     // Start transaction
     $conn->begin_transaction();
@@ -32,11 +32,11 @@ if (isset($_POST['deposit_submit'])) {
 
         // Insert into transactions table with hub_location
         $hub_location = "Recycling Center"; // Change or customize as needed
-        $historySql = "INSERT INTO transactions (user_id, material_type, weight, points, hub_location, status, date) 
-                       VALUES (?, ?, ?, ?, ?, 'Verified', NOW())";
-        $stmtHist = $conn->prepare($historySql);
-        $stmtHist->bind_param("isdiss", $cust_id, $material, $weight, $points, $hub_location);
-        $stmtHist->execute();
+$historySql = "INSERT INTO transactions (user_id, material_type, weight, points, hub_location, status, date) 
+               VALUES (?, ?, ?, ?, ?, 'Verified', NOW())";
+$stmtHist = $conn->prepare($historySql);
+$stmtHist->bind_param("isdis", $cust_id, $material, $weight, $points, $hub_location);
+$stmtHist->execute();
 
         $conn->commit();
         $message = "<div class='alert success'>✅ Success! Added $points points to User #$cust_id.</div>";

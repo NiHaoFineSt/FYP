@@ -1,6 +1,6 @@
 <?php
 session_start();
-include __DIR__ . '/config.php';
+include __DIR__ . '/config.php'; // Updated include path
 
 // SECURITY CHECK (Ensure logged-in user is an admin)
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
@@ -28,15 +28,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['user_id'], $_POST['ac
     exit();
 }
 
-// FETCH ALL PENDING FACTORY STAFF
-$pending_query = "SELECT user_id, name, email, phone_number, created_at 
+// FETCH ALL PENDING FACTORY STAFF (Using `phone` column)
+$pending_query = "SELECT user_id, name, email, phone, created_at 
                  FROM users 
                  WHERE role = 'factory' AND status = 'pending' 
                  ORDER BY created_at ASC";
 $pending_result = $conn->query($pending_query);
 
-// FETCH APPROVED FACTORY STAFF FOR REFERENCE
-$approved_query = "SELECT user_id, name, email, phone_number, created_at 
+// FETCH APPROVED FACTORY STAFF FOR REFERENCE (Using `phone` column)
+$approved_query = "SELECT user_id, name, email, phone, created_at 
                   FROM users 
                   WHERE role = 'factory' AND status = 'approved' 
                   ORDER BY name ASC";
@@ -117,11 +117,9 @@ $approved_result = $conn->query($approved_query);
         <aside class="sidebar">
             <div class="logo">Recycle<span>Hub Admin</span></div>
             <nav class="side-nav">
-                <a href="admin.php">Overview</a>
-                <a href="manage_user.php">Manage Citizens</a>
-                <a href="manage_staff.php">Manage Staff</a>
-                <a href="manage_center.php">Manage Centers</a>
+                <a href="admin_dashboard.php">Overview</a>
                 <a href="approve_factory_staff.php" class="active">Factory Staff Approvals</a>
+                <a href="manage_centers.php">Recycling Centers</a>
                 <div class="nav-divider"></div>
                 <a href="../logout.php" class="logout">Logout</a>
             </nav>
@@ -164,7 +162,7 @@ $approved_result = $conn->query($approved_query);
                                     <td>#<?= htmlspecialchars($row['user_id']) ?></td>
                                     <td><strong><?= htmlspecialchars($row['name']) ?></strong></td>
                                     <td><?= htmlspecialchars($row['email']) ?></td>
-                                    <td><?= htmlspecialchars($row['phone_number'] ?? 'N/A') ?></td>
+                                    <td><?= htmlspecialchars($row['phone'] ?? 'N/A') ?></td>
                                     <td><?= date('Y-m-d H:i', strtotime($row['created_at'])) ?></td>
                                     <td>
                                         <div class="action-btns">
@@ -214,7 +212,7 @@ $approved_result = $conn->query($approved_query);
                                     <td>#<?= htmlspecialchars($row['user_id']) ?></td>
                                     <td><strong><?= htmlspecialchars($row['name']) ?></strong></td>
                                     <td><?= htmlspecialchars($row['email']) ?></td>
-                                    <td><?= htmlspecialchars($row['phone_number'] ?? 'N/A') ?></td>
+                                    <td><?= htmlspecialchars($row['phone'] ?? 'N/A') ?></td>
                                     <td><span style="color: #28a745; font-weight: bold;">● Active</span></td>
                                 </tr>
                             <?php endwhile; ?>

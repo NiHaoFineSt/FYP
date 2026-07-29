@@ -50,7 +50,7 @@ $approved_result = $conn->query($approved_query);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Approve Factory Staff | RecycleHub Admin</title>
     <link rel="stylesheet" href="../style.css">
-    <link rel="stylesheet" href="admin_dashboard.css">
+    <link rel="stylesheet" href="admin.css">
     <style>
         .table-card {
             background: #fff;
@@ -118,8 +118,10 @@ $approved_result = $conn->query($approved_query);
             <div class="logo">Recycle<span>Hub Admin</span></div>
             <nav class="side-nav">
                 <a href="admin_dashboard.php">Overview</a>
-                <a href="approve_factory_staff.php" class="active">Factory Staff Approvals</a>
+                <a href="manage_staff.php">Manage Staff</a>
                 <a href="manage_centers.php">Recycling Centers</a>
+                <a href="manage_users.php">Manage Users</a>
+                <a href="approve_factory_staff.php" class="active">Factory Staff Approvals</a>
                 <div class="nav-divider"></div>
                 <a href="../logout.php" class="logout">Logout</a>
             </nav>

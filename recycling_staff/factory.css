@@ -1,0 +1,153 @@
+/* =========================================
+   FACTORY CAPACITY PAGE STYLES
+   ========================================= */
+
+.factory-container {
+    width: 100%;
+    margin-top: 1rem;
+}
+
+/* Factory Grid Layout */
+.factory-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+}
+
+/* Factory Card Container */
+.factory-card {
+    background: #ffffff;
+    border: 1px solid var(--border, #eeeeee);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.card-header h3 {
+    font-size: 1.1rem;
+    margin: 0;
+    color: var(--primary-dark, #2d5a27);
+}
+
+/* Badges */
+.capacity-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: bold;
+}
+
+.status-normal {
+    background: #e8f5e9;
+    color: #2d5a27;
+}
+
+.status-warning {
+    background: #fff3e0;
+    color: #e65100;
+}
+
+.status-danger {
+    background: #ffebee;
+    color: #c62828;
+}
+
+/* Capacity Details */
+.capacity-details {
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    color: var(--text-main, #333333);
+}
+
+.capacity-details p {
+    margin: 4px 0;
+}
+
+/* Progress Bar */
+.progress-bar-bg {
+    width: 100%;
+    height: 10px;
+    background: #e0e0e0;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 1.2rem;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 0.4s ease;
+}
+
+.progress-bar-fill.status-normal {
+    background: #2d5a27;
+}
+
+.progress-bar-fill.status-warning {
+    background: #f57c00;
+}
+
+.progress-bar-fill.status-danger {
+    background: #d32f2f;
+}
+
+/* Footer Metadata */
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: #777777;
+    border-top: 1px solid var(--border, #eeeeee);
+    padding-top: 0.8rem;
+}
+
+.empty-state {
+    background: #ffffff;
+    padding: 3rem;
+    text-align: center;
+    border-radius: 12px;
+    border: 1px solid var(--border, #eeeeee);
+    color: #666666;
+}
+
+/* =========================================
+   MOBILE RESPONSIVE ADJUSTMENTS
+   ========================================= */
+@media (max-width: 768px) {
+    .dashboard-wrapper {
+        flex-direction: column !important;
+    }
+
+    .sidebar {
+        width: 100% !important;
+        max-height: 200px;
+    }
+
+    .dashboard-content {
+        width: 100% !important;
+        padding: 10px !important;
+    }
+
+    .factory-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .factory-card {
+        padding: 1rem;
+    }
+
+    .card-footer {
+        flex-direction: column;
+        gap: 4px;
+    }
+}

@@ -3,12 +3,12 @@ session_start();
 require_once __DIR__ . '/../config.php';
 
 // Ensure user is logged in as staff
-if (!isset($_SESSION['staff_id'])) {
+if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }
 
-$staff_id = $_SESSION['staff_id'];
+$user_id = $_SESSION['user_id'];
 
 // Fetch staff details along with assigned recycling center info
 $query = "SELECT s.*, rc.center_name, rc.location, rc.operating_hours, rc.status AS center_status 
@@ -16,7 +16,7 @@ $query = "SELECT s.*, rc.center_name, rc.location, rc.operating_hours, rc.status
           LEFT JOIN recycling_centers rc ON s.center_id = rc.id 
           WHERE s.id = ?";
 $stmt = $conn->prepare($query);
-$stmt->bind_param("i", $staff_id);
+$stmt->bind_param("i", $user_id);
 $stmt->execute();
 $staff = $stmt->get_result()->fetch_assoc();
 

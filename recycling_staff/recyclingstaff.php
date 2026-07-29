@@ -35,7 +35,7 @@ $today_weight = $weight_res->fetch_assoc()['today_kg'] ?? 0;
                 <a href="staffscan.php">Scan QR</a>
                 <a href="factory.php">Factory</a>
                 <a href="staffchat.php">Staff Chat</a>
-                <a href="staffprofile.php">Profile</a>
+                <a href="staff_profile.php">Profile</a>
                 <div class="nav-divider"></div>
                 <a href="../logout.php" class="logout">Logout</a>
             </nav>

@@ -25,21 +25,7 @@
     border-radius: 10px;
 }
 
-/* Responsive Tweak for Chat */
-@media (max-width: 992px) {
-    .chat-list {
-        width: 80px;
-    }
-    .chat-list .contact p, 
-    .chat-list .contact h4, 
-    .chat-list input {
-        display: none;
-    }
-    .chat-list .contact {
-        text-align: center;
-        padding: 1rem 0;
-    }
-}
+
 
 /* Ensure Chat Header aligns with Profile style */
 .chat-main-header h3 {
@@ -53,6 +39,7 @@
 .msg.incoming p {
     color: var(--text-main);
 }
+
 
 @media (max-width: 768px) {
     /* Stack sidebars and main layout elements vertically */

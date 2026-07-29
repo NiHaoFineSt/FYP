@@ -11,10 +11,10 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 
 // Fetch staff details along with assigned recycling center info
-$query = "SELECT s.*, rc.center_name, rc.location, rc.operating_hours, rc.status AS center_status 
-          FROM staff s 
-          LEFT JOIN recycling_centers rc ON s.center_id = rc.id 
-          WHERE s.id = ?";
+$query = "SELECT u.*, rc.center_name, rc.location, rc.operating_hours, rc.status AS center_status 
+          FROM users u 
+          LEFT JOIN recycling_centers rc ON u.center_id = rc.id 
+          WHERE u.user_id = ?";
 $stmt = $conn->prepare($query);
 $stmt->bind_param("i", $user_id);
 $stmt->execute();

@@ -7,24 +7,30 @@ include 'config.php';
 $error = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // 2. Sanitize input to prevent SQL injection
-    $email = mysqli_real_escape_string($conn, $_POST['email']);
+    $email = trim($_POST['email']);
     $password = $_POST['password'];
 
-    // 3. Search for user by email
-    $sql = "SELECT * FROM users WHERE email='$email'";
-    $result = $conn->query($sql);
+    // 2. Prepared Statement to prevent SQL injection
+    $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
     if ($result && $result->num_rows > 0) {
         $user = $result->fetch_assoc();
         
-        // 4. Verify the hashed password
+        // 3. Verify the hashed password
         if (password_verify($password, $user['password'])) {
 
-            // --- STAFF APPROVAL CHECK ---
-            // If the role is staff and they are NOT approved, block access
-            if ($user['role'] == 'recycling staff' && $user['is_approved'] == 0) {
-                $error = "Your account is pending admin approval. Please wait for document review.";
+            // --- APPROVAL CHECKS FOR STAFF & FACTORY ROLES ---
+            // Handles both 'status' ('pending'/'approved') and 'is_approved' (0/1) schema variations
+            $is_pending_status = (isset($user['status']) && $user['status'] === 'pending');
+            $is_unapproved_flag = (isset($user['is_approved']) && $user['is_approved'] == 0);
+
+            if ($user['role'] === 'recycling staff' && ($is_pending_status || $is_unapproved_flag)) {
+                $error = "Your recycling staff account is pending admin approval. Please wait for document review.";
+            } elseif ($user['role'] === 'factory' && ($is_pending_status || $is_unapproved_flag)) {
+                $error = "Your factory staff account is pending admin approval. Please wait for an administrator to activate your account.";
             } else {
                 // Login Success! Set session variables
                 $_SESSION['user_id'] = $user['user_id'];
@@ -33,12 +39,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 ob_end_clean(); 
 
-                // 5. Redirect based on role
-                if ($user['role'] == 'admin') {
+                // 4. Redirect based on role
+                if ($user['role'] === 'admin') {
                     header("Location: admin.php");
-                } elseif ($user['role'] == 'factory') {
-                    header("Location: factory_dashboard.php");
-                } elseif ($user['role'] == 'recycling staff') {
+                } elseif ($user['role'] === 'factory') {
+                    header("Location: factory/factorystaff.php");
+                } elseif ($user['role'] === 'recycling staff') {
                     header("Location: recycling_staff/recyclingstaff.php");
                 } else {
                     header("Location: user/citizen_dashboard.php");
@@ -51,6 +57,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         $error = "No account found with that email!";
     }
+    $stmt->close();
 }
 ?>
 
@@ -80,9 +87,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <p>Log in to your RecycleHub account</p>
             </div>
 
-            <?php if($error != ""): ?>
+            <?php if(!empty($error)): ?>
                 <div style="color: #d9534f; background: #f2dede; padding: 12px; border-radius: 8px; text-align: center; font-size: 0.9rem; margin-bottom: 20px; border: 1px solid #ebccd1;">
-                    ⚠️ <?php echo $error; ?>
+                    ⚠️ <?php echo htmlspecialchars($error); ?>
                 </div>
             <?php endif; ?>
 

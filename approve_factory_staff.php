@@ -1,6 +1,6 @@
 <?php
 session_start();
-include __DIR__ . '/../config.php';
+include __DIR__ . '/config.php';
 
 // SECURITY CHECK (Ensure logged-in user is an admin)
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {

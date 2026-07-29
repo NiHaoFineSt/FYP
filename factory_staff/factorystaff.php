@@ -76,7 +76,6 @@ $pending_result = $conn->query($pending_query);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Factory Command Center | RecycleHub</title>
-    <link rel="stylesheet" href="managerequest.css">
     <link rel="stylesheet" href="factorystaff.css">
     <style>
         .actions form {

@@ -44,7 +44,6 @@ $history_result = $conn->query($history_query);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Request History & Stock | RecycleHub</title>
-    <link rel="stylesheet" href="managerequest.css">
     <link rel="stylesheet" href="factory_stock.css">
     <style>
         .status-pill {

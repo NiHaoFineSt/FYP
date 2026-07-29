@@ -51,7 +51,7 @@ $initials = strtoupper(substr($words[0], 0, 1) . (isset($words[1]) ? substr($wor
                 <a href="myrecycing.php">My Recycling</a>
                 <a href="dropoff.php">Drop-off Points</a>
                 <a href="customerqr.php">My QR Code</a>
-                <a href="userscan.php">Scan QR</a>
+                <a href="userscan.php">Claim Code</a>
                 <a href="reward.php">Rewards</a>
                 <a href="Profilepage.php" class="active">Profile Settings</a>
                 <div class="nav-divider"></div>
@@ -107,8 +107,6 @@ $initials = strtoupper(substr($words[0], 0, 1) . (isset($words[1]) ? substr($wor
                             <label style="display: block; margin-bottom: 8px; font-weight: 600;">Language</label>
                             <select name="lang" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; background: white;">
                                 <option>English</option>
-                                <option>Bahasa Melayu</option>
-                                <option>Mandarin</option>
                             </select>
                         </div>
                     </div>

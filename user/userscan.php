@@ -135,13 +135,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_pin'])) {
                 <?php endif; ?>
 
                 <div>
-                    <h3>Kemasukan Kod Ganjaran</h3>
-                    <p>Masukkan 4-digit PIN yang terpapar di skrin OLED mesin penimbang.</p>
-                    
+                    <h3>Claim Your Reward Code</h3>
+                    <p>Insert the 4-digit PIN displayed on the OLED screen of the recycling machine.</p>
+
                     <form method="POST" action="">
                         <input type="text" name="pin_code" maxlength="4" placeholder="0000" required autocomplete="off" style="font-size: 2rem; letter-spacing: 8px; text-align: center; padding: 10px; width: 100%; max-width: 250px; margin: 20px 0; display: block;">
-                        
-                        <button type="submit" name="submit_pin" class="btn-primary">Tuntut Mata Ganjaran</button>
+
+                        <button type="submit" name="submit_pin" class="btn-primary">Claim Reward Points</button>
                     </form>
                 </div>
 

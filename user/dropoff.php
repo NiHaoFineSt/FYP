@@ -9,6 +9,18 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'user') {
 }
 
 $user_id = $_SESSION['user_id'];
+
+// Fetch distinct states for the dropdown filter
+$states_query = "SELECT DISTINCT state FROM recycling_centers WHERE state IS NOT NULL AND state != '' ORDER BY state ASC";
+$states_result = $conn->query($states_query);
+
+// Fetch distinct locations/cities for the dropdown filter
+$locations_query = "SELECT DISTINCT location FROM recycling_centers WHERE location IS NOT NULL AND location != '' ORDER BY location ASC";
+$locations_result = $conn->query($locations_query);
+
+// Fetch all recycling centers from database
+$hubs_query = "SELECT * FROM recycling_centers ORDER BY center_name ASC";
+$hubs_result = $conn->query($hubs_query);
 ?>
 
 <!DOCTYPE html>
@@ -19,7 +31,27 @@ $user_id = $_SESSION['user_id'];
     <title>Drop-off Points | RecycleHub</title>
     <link rel="stylesheet" href="../style.css"> 
     <link rel="stylesheet" href="dropoff.css">
-    <link rel="stylesheet" href="citizen dashboard.css"> </head>
+    <link rel="stylesheet" href="citizen dashboard.css">
+    <!-- QRCode library loaded in head so it's available when needed -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        .filter-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .area-select {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 0.9rem;
+            outline: none;
+            background-color: #fff;
+            min-width: 160px;
+        }
+    </style>
+</head>
 <body>
 
     <div class="dashboard-wrapper">
@@ -29,7 +61,7 @@ $user_id = $_SESSION['user_id'];
                 <div style="background: white; padding: 8px; border-radius: 8px; width: 100px; height: 100px; margin: 0 auto 10px auto;">
                     <div id="sidebar-qrcode"></div>
                 </div>
-                <p style="color: white;">ID: #<?php echo $user_id; ?></p>
+                <p style="color: white;">ID: #<?php echo htmlspecialchars($user_id); ?></p>
             </div>
             <nav class="side-nav">
                 <a href="citizen_dashboard.php">Overview</a>
@@ -44,22 +76,43 @@ $user_id = $_SESSION['user_id'];
                 <a href="../logout.php" class="logout">Logout</a>
             </nav>
         </aside>
+
         <main class="dashboard-content">
             <header class="dash-header">
                 <div>
                     <h2>Drop-off Points</h2>
-                    <p>Locate the nearest Community Recycling Centers (CRC).</p>
+                    <p>Locate the nearest Community Recycling Centers (CRC) and facilities.</p>
                 </div>
                 <button class="btn-primary" onclick="getLocation()" style="padding: 10px 20px; cursor: pointer;">Use Current Location</button>
             </header>
 
             <section class="activity-section">
                 <div class="section-header">
-                    <h3>Interactive Hub Map</h3>
-                    <div class="map-filters">
-                        <button class="filter-btn active">All</button>
-                        <button class="filter-btn">CRC</button>
-                        <button class="filter-btn">MRCF</button>
+                    <h3>Interactive Hub Finder</h3>
+                    <div class="filter-controls">
+                        <!-- State Dropdown Filter -->
+                        <select id="state-filter" class="area-select" onchange="filterHubs()">
+                            <option value="all">All States</option>
+                            <?php 
+                            if ($states_result && $states_result->num_rows > 0) {
+                                while($state_row = $states_result->fetch_assoc()) {
+                                    echo '<option value="' . htmlspecialchars($state_row['state']) . '">' . htmlspecialchars($state_row['state']) . '</option>';
+                                }
+                            }
+                            ?>
+                        </select>
+
+                        <!-- Location / City Dropdown Filter -->
+                        <select id="location-filter" class="area-select" onchange="filterHubs()">
+                            <option value="all">All Locations / Cities</option>
+                            <?php 
+                            if ($locations_result && $locations_result->num_rows > 0) {
+                                while($loc_row = $locations_result->fetch_assoc()) {
+                                    echo '<option value="' . htmlspecialchars($loc_row['location']) . '">' . htmlspecialchars($loc_row['location']) . '</option>';
+                                }
+                            }
+                            ?>
+                        </select>
                     </div>
                 </div>
             </section>
@@ -74,34 +127,44 @@ $user_id = $_SESSION['user_id'];
                     <table class="activity-table">
                         <thead>
                             <tr>
-                                <th>Hub Name</th>
-                                <th>Accepted Materials</th>
-                                <th>Distance</th>
+                                <th>Center Name</th>
+                                <th>Location / State</th>
+                                <th>Full Address</th>
                                 <th>Operating Hours</th>
+                                <th>Phone Number</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody id="hub-list-body">
-                            <tr>
-                                <td><strong>Downtown CRC</strong></td>
-                                <td>
-                                    <span class="material-tag plastic">Plastic</span>
-                                    <span class="material-tag paper">Paper</span>
-                                </td>
-                                <td>1.2 km</td>
-                                <td>08:00 AM - 06:00 PM</td>
-                                <td><button class="btn-outline">Directions</button></td>
-                            </tr>
-                            <tr>
-                                <td><strong>Westside MRCF</strong></td>
-                                <td>
-                                    <span class="material-tag metal">Metal</span>
-                                    <span class="material-tag glass">Glass</span>
-                                </td>
-                                <td>3.5 km</td>
-                                <td>09:00 AM - 05:00 PM</td>
-                                <td><button class="btn-outline">Directions</button></td>
-                            </tr>
+                            <?php if ($hubs_result && $hubs_result->num_rows > 0): ?>
+                                <?php while ($hub = $hubs_result->fetch_assoc()): ?>
+                                    <tr class="hub-row" 
+                                        data-state="<?= htmlspecialchars($hub['state'] ?? '') ?>" 
+                                        data-location="<?= htmlspecialchars($hub['location'] ?? '') ?>">
+                                        <td><strong><?= htmlspecialchars($hub['center_name']) ?></strong></td>
+                                        <td>
+                                            <?= htmlspecialchars($hub['location']) ?><?= (!empty($hub['state']) ? ', ' . htmlspecialchars($hub['state']) : '') ?>
+                                        </td>
+                                        <td><?= htmlspecialchars($hub['full_address'] ?? 'N/A') ?></td>
+                                        <td><?= htmlspecialchars($hub['service_hours'] ?? 'N/A') ?></td>
+                                        <td><?= htmlspecialchars($hub['phone_number'] ?? 'N/A') ?></td>
+                                        <td>
+                                            <?php 
+                                                // Uses google_maps_link column, fallback to search query if empty
+                                                $map_url = !empty($hub['google_maps_link']) 
+                                                    ? $hub['google_maps_link'] 
+                                                    : "https://www.google.com/maps/search/?api=1&query=" . urlencode($hub['center_name'] . " " . $hub['full_address']);
+                                            ?>
+                                            <a href="<?= htmlspecialchars($map_url) ?>" 
+                                               target="_blank" class="btn-outline" style="text-decoration: none; padding: 6px 12px; display: inline-block;">Directions</a>
+                                        </td>
+                                    </tr>
+                                <?php endwhile; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="6" style="text-align: center; color: #888;">No recycling centers registered yet.</td>
+                                </tr>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
@@ -123,18 +186,37 @@ $user_id = $_SESSION['user_id'];
             document.getElementById('nearest-info').innerText = "Showing centers near your current coordinates (" + position.coords.latitude.toFixed(2) + ", " + position.coords.longitude.toFixed(2) + ").";
         }
 
-        // Use PHP to echo the actual User ID into the JavaScript
-        var userID = "<?php echo $user_id; ?>";
+        // Live Filtering Logic
+        function filterHubs() {
+            var selectedState = document.getElementById('state-filter').value.toLowerCase();
+            var selectedLocation = document.getElementById('location-filter').value.toLowerCase();
+            var rows = document.querySelectorAll('.hub-row');
+            var visibleCount = 0;
 
-        new QRCode(document.getElementById("qrcode"), {
-            text: userID, // This is what the staff scanner will read
-            width: 220,
-            height: 220,
-            colorDark : "#2d5a27",
-            colorLight : "#ffffff",
-            correctLevel : QRCode.CorrectLevel.H
-        });
+            rows.forEach(function(row) {
+                var rowState = row.getAttribute('data-state').toLowerCase();
+                var rowLocation = row.getAttribute('data-location').toLowerCase();
 
+                var stateMatches = (selectedState === 'all' || rowState === selectedState);
+                var locationMatches = (selectedLocation === 'all' || rowLocation === selectedLocation);
+
+                if (stateMatches && locationMatches) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            var nearestInfo = document.getElementById('nearest-info');
+            if (visibleCount === 0) {
+                nearestInfo.innerText = "No locations found matching the selected filter criteria.";
+            } else {
+                nearestInfo.innerText = "Displaying " + visibleCount + " center(s).";
+            }
+        }
+
+        // Generate Sidebar QR Code
         window.onload = function() {
             var userId = "<?php echo $user_id; ?>";
             var qrBox = document.getElementById("sidebar-qrcode");
@@ -151,4 +233,3 @@ $user_id = $_SESSION['user_id'];
     </script>
 </body>
 </html>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>

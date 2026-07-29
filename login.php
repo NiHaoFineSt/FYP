@@ -47,9 +47,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 if ($user['role'] === 'admin') {
                     header("Location: admin.php");
                 } elseif ($user['role'] === 'factory') {
-                    header("Location: factory/factorystaff.php");
+                    header("Location: factorystaff.php");
                 } elseif ($user['role'] === 'recycling staff') {
-                    header("Location: recycling_staff/recyclingstaff.php");
+                    header("Location: recycingstaff.php");
                 } else {
                     header("Location: user/citizen_dashboard.php");
                 }

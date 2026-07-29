@@ -33,7 +33,7 @@ $result = $conn->query("SELECT * FROM users WHERE LOWER(role) = 'user'");
             <a href="manage_user.php" class="active">Manage Citizens</a>
             <a href="manage_staff.php">Manage Staff</a>
             <a href="manage_center.php">Manage Centers</a>
-            <a href="approve_center.php">Manage Factory</a>
+            <a href="approve_factory_staff.php">Manage Factory</a>
             <a href="logout.php" class="logout">Logout</a>
         </nav>
     </aside>

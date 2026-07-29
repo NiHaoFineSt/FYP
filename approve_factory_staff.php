@@ -120,7 +120,6 @@ $approved_result = $conn->query($approved_query);
                 <a href="admin_dashboard.php">Overview</a>
                 <a href="manage_staff.php">Manage Staff</a>
                 <a href="manage_centers.php">Recycling Centers</a>
-                <a href="manage_users.php">Manage Users</a>
                 <a href="approve_factory_staff.php" class="active">Factory Staff Approvals</a>
                 <div class="nav-divider"></div>
                 <a href="../logout.php" class="logout">Logout</a>

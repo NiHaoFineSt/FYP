@@ -35,7 +35,6 @@ if (isset($_POST['approve_staff'])) {
         <div class="logo">Recycle<span>Hub</span></div>
         <nav class="side-nav">
             <a href="admin.php">Overview</a>
-            <a href="manage_user.php">Manage Citizens</a>
             <a href="manage_staff.php" class="active">Manage Staff</a>
             <a href="manage_center.php">Manage Centers</a>
             <a href="approve_factory_staff.php">Manage Factory</a>

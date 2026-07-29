@@ -24,13 +24,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             // --- APPROVAL CHECKS FOR STAFF & FACTORY ROLES ---
             // Handles both 'status' ('pending'/'approved') and 'is_approved' (0/1) schema variations
-            $is_pending_status = (isset($user['status']) && $user['status'] === 'pending');
-            $is_unapproved_flag = (isset($user['is_approved']) && $user['is_approved'] == 0);
+            $$status_is_approved = (!isset($user['status']) || strtolower($user['status']) === 'approved');
+$flag_is_approved   = (!isset($user['is_approved']) || $user['is_approved'] == 1);
 
-            if ($user['role'] === 'recycling staff' && ($is_pending_status || $is_unapproved_flag)) {
-                $error = "Your recycling staff account is pending admin approval. Please wait for document review.";
-            } elseif ($user['role'] === 'factory' && ($is_pending_status || $is_unapproved_flag)) {
-                $error = "Your factory staff account is pending admin approval. Please wait for an administrator to activate your account.";
+$is_fully_approved  = $status_is_approved && $flag_is_approved;
+
+if (!$is_fully_approved) {
+    if ($user['role'] === 'recycling staff') {
+        $error = "Your recycling staff account is pending admin approval. Please wait for document review.";
+    } elseif ($user['role'] === 'factory') {
+        $error = "Your factory staff account is pending admin approval. Please wait for an administrator to activate your account.";
+    }
             } else {
                 // Login Success! Set session variables
                 $_SESSION['user_id'] = $user['user_id'];

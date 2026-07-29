@@ -45,7 +45,6 @@ $recent_result = $conn->query($recent_query);
         <div class="logo">Recycle<span>Hub</span></div>
         <nav class="side-nav">
             <a href="admin.php" class="active">Overview</a>
-            <a href="manage_user.php">Manage Citizens</a>
             <a href="manage_staff.php">Manage Staff</a>
             <a href="manage_center.php">Manage Centers</a>
             <a href="approve_factory_staff.php">Manage Factory</a>

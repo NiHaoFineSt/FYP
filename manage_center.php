@@ -75,7 +75,6 @@ $result = $conn->query("SELECT * FROM recycling_centers ORDER BY center_id DESC"
         <div class="logo">Recycle<span>Hub</span></div>
         <nav class="side-nav">
             <a href="admin.php">Overview</a>
-            <a href="manage_user.php">Manage Citizens</a>
             <a href="manage_staff.php">Manage Staff</a>
             <a href="manage_center.php" class="active">Manage Centers</a>
             <a href="approve_factory_staff.php">Manage Factory</a>

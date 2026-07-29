@@ -1,5 +1,5 @@
 <?php
-// Keep error reporting on while we are debugging
+// Keep error reporting on while debugging
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
@@ -12,36 +12,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
     $role = $_POST['role'];
     
-    $document_name = null; // Default kosong jika tiada dokumen (untuk user biasa)
-    $status = 'approved';  // User biasa terus diluluskan
+    $document_data = null; // Default null for normal users
+    $status = 'approved';  // Normal users approved automatically
 
     // JIKA pendaftar adalah staff atau kilang, wajibkan muat naik dokumen
     if ($role === 'recycling staff' || $role === 'factory') {
-        $status = 'pending'; // Akaun perlu disemak oleh admin dahulu
+        $status = 'pending'; // Account needs admin approval
 
         if (isset($_FILES['document']) && $_FILES['document']['error'] == 0) {
             $allowed_extensions = ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'];
             $file_name = $_FILES['document']['name'];
-            $file_size = $_FILES['document']['size'];
             $file_tmp  = $_FILES['document']['tmp_name'];
             
             $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
 
             // Sahkan format fail
             if (in_array($file_ext, $allowed_extensions)) {
-                // Beri nama unik kepada fail bagi mengelakkan pertindihan nama
-                $document_name = time() . '_' . uniqid() . '.' . $file_ext;
-                $upload_dir = 'uploads/documents/';
-
-                // Cipta folder uploads jika belum wujud
-                if (!is_dir($upload_dir)) {
-                    mkdir($upload_dir, 0777, true);
+                
+                // Read binary file and encode as Base64 to bypass serverless read-only storage
+                $file_binary = file_get_contents($file_tmp);
+                $mime_type = $_FILES['document']['type'];
+                if (empty($mime_type)) {
+                    $mime_type = 'application/octet-stream';
                 }
 
-                // Pindahkan fail ke folder tujuan
-                if (!move_uploaded_file($file_tmp, $upload_dir . $document_name)) {
-                    die("Gagal memindahkan fail muat naik.");
-                }
+                // Store full Data URI so it can be viewed or downloaded easily
+                $document_data = 'data:' . $mime_type . ';base64,' . base64_encode($file_binary);
+
             } else {
                 echo "<script>alert('Format fail tidak dibenarkan! Sila muat naik PDF, Word, atau Gambar sahaja.'); window.history.back();</script>";
                 exit();
@@ -52,15 +49,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    // Ganti/Suaikan query jika table 'users' anda mempunyai kolon 'document' dan 'status'
-    // Prepared statement untuk keselamatan
+    // Prepared statement inserting Base64 data into document column
     $stmt = $conn->prepare("INSERT INTO users (name, email, password, role, document, status) VALUES (?, ?, ?, ?, ?, ?)");
     
     if ($stmt === false) {
         die("Preparation failed: " . $conn->error);
     }
 
-    $stmt->bind_param("ssssss", $name, $email, $password, $role, $document_name, $status);
+    $stmt->bind_param("ssssss", $name, $email, $password, $role, $document_data, $status);
 
     if ($stmt->execute()) {
         if ($status === 'pending') {
@@ -117,7 +113,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <p>Select your role to get started</p>
             </div>
 
-            <!-- Ditambah enctype="multipart/form-data" untuk membolehkan muat naik fail -->
             <form method="POST" action="register.php" enctype="multipart/form-data">
                 <div class="form-row">
                     <div class="input-group">
@@ -160,7 +155,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
     </section>
 
-    <!-- JavaScript untuk fungsi dinamik paparan input file -->
     <script>
     function toggleDocumentUpload() {
         var roleSelect = document.getElementById("role-select").value;
@@ -169,11 +163,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if (roleSelect === "recycling staff" || roleSelect === "factory") {
             uploadSection.style.display = "block";
-            docInput.required = true; // Wajib isi jika pilih staff/kilang
+            docInput.required = true;
         } else {
             uploadSection.style.display = "none";
-            docInput.required = false; // Pengguna biasa tidak perlu isi
-            docInput.value = ""; // Reset fail jika pengguna tukar pilihan semula
+            docInput.required = false;
+            docInput.value = "";
         }
     }
     </script>

@@ -2,9 +2,32 @@
    CHAT SYSTEM SPECIFICS
    ========================================= */
 
+/* Main layout container */
 .chat-wrapper {
+    display: flex;
+    height: calc(100vh - 180px);
+    min-height: 480px;
+    background: #ffffff;
+    border-radius: 12px;
     overflow: hidden;
     border: 1px solid var(--border);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Contacts Sidebar (Left Pane) */
+.chat-list {
+    width: 280px;
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    flex-shrink: 0;
+    background: #ffffff;
+}
+
+.contact {
+    padding: 0.8rem 1rem;
+    cursor: pointer;
+    border-bottom: 1px solid #f9f9f9;
+    transition: background 0.2s ease, border-left 0.2s ease;
 }
 
 .contact:hover {
@@ -16,6 +39,60 @@
     border-left: 4px solid var(--primary-dark);
 }
 
+.contact h4 {
+    font-size: 0.9rem;
+    margin: 0 0 4px 0;
+    color: var(--text-main);
+}
+
+.contact p {
+    font-size: 0.75rem;
+    color: #666666;
+    margin: 0;
+}
+
+/* Main Chat Window (Right Pane) */
+.chat-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0; /* Prevents text overflow from expanding container width */
+    background: #ffffff;
+}
+
+.chat-main-header {
+    padding: 1rem 1.2rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #ffffff;
+}
+
+/* Ensure Chat Header aligns with Profile style */
+.chat-main-header h3 {
+    font-size: 1rem;
+    margin: 0;
+    color: var(--primary-dark);
+}
+
+.chat-main-header span {
+    font-size: 0.75rem;
+    color: #666666;
+}
+
+/* Messages Area & Bubbles */
+.chat-messages {
+    flex: 1;
+    padding: 1rem 1.2rem;
+    overflow-y: auto;
+    background: #fafafa;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+/* Custom Scrollbar */
 .chat-messages::-webkit-scrollbar {
     width: 6px;
 }
@@ -25,22 +102,97 @@
     border-radius: 10px;
 }
 
+/* Generic Message Bubble */
+.msg {
+    max-width: 75%;
+    padding: 0.7rem 0.9rem;
+    border-radius: 12px;
+    line-height: 1.4;
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
 
+.msg p {
+    font-size: 0.88rem;
+    margin: 0 0 4px 0;
+}
 
-/* Ensure Chat Header aligns with Profile style */
-.chat-main-header h3 {
-    color: var(--primary-dark);
+.msg span {
+    font-size: 0.65rem;
+    display: block;
+    text-align: right;
+}
+
+/* Outgoing Messages (Sent by current staff) */
+.msg.outgoing {
+    align-self: flex-end;
+    background: var(--primary-dark);
+    border-bottom-right-radius: 2px;
 }
 
 .msg.outgoing p {
     color: white;
 }
 
+.msg.outgoing span {
+    color: #aec6ab;
+}
+
+/* Incoming Messages (Received from colleague) */
+.msg.incoming {
+    align-self: flex-start;
+    background: #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    border-bottom-left-radius: 2px;
+}
+
 .msg.incoming p {
     color: var(--text-main);
 }
 
+.msg.incoming span {
+    color: #888888;
+}
 
+/* Input Form Bar */
+.chat-input-area {
+    padding: 0.8rem 1rem;
+    border-top: 1px solid var(--border);
+    background: #ffffff;
+}
+
+.chat-input-area form {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.chat-input-area input[type="text"] {
+    flex: 1;
+    padding: 0.8rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    outline: none;
+}
+
+.chat-input-area input[type="text"]:focus {
+    border-color: var(--primary-dark);
+}
+
+.chat-input-area button {
+    background: var(--primary-dark);
+    color: #ffffff;
+    border: none;
+    padding: 0 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+/* =========================================
+   MOBILE RESPONSIVE MEDIA QUERY
+   ========================================= */
 @media (max-width: 768px) {
     /* Stack sidebars and main layout elements vertically */
     .dashboard-wrapper,
@@ -79,5 +231,10 @@
         max-width: 90% !important;
         word-break: break-word;
         overflow-wrap: break-word;
+    }
+
+    .chat-messages {
+        height: 380px;
+        padding: 0.8rem;
     }
 }

@@ -93,12 +93,11 @@ if ($active_recipient_id) {
             <div class="logo">Recycle<span>Hub</span></div>
             <nav class="side-nav">
                 <a href="recyclingstaff.php">Overview</a>
-                <a href="managerequest.php">Manage Requests</a>
                 <a href="inventorylog.php">Inventory Log</a>
                 <a href="staffscan.php">Scan QR</a>
                 <a href="factory.php">Factory Recs</a>
                 <a href="staffchat.php" class="active">Staff Chat</a>
-                <a href="staffprofile.php">Profile</a>
+                <a href="staff_profile.php">Profile</a>
                 <div class="nav-divider"></div>
                 <a href="../logout.php" class="logout">Logout</a>
             </nav>

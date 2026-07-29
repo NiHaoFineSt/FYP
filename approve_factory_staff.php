@@ -13,17 +13,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['user_id'], $_POST['ac
     $target_user_id = intval($_POST['user_id']);
     $action = $_POST['action']; // 'approved' or 'rejected'
 
-    if (in_array($action, ['approved', 'rejected'])) {
-        $stmt = $conn->prepare("UPDATE users SET status = ? WHERE user_id = ? AND role = 'factory'");
-        $stmt->bind_param("si", $action, $target_user_id);
-        
-        if ($stmt->execute()) {
-            $_SESSION['msg'] = "Factory staff request has been " . ucfirst($action) . " successfully!";
-        } else {
-            $_SESSION['err'] = "Failed to update user status.";
-        }
-        $stmt->close();
+    if (isset($_POST['approve_staff'])) {
+    $staff_id = intval($_POST['user_id']);
+    
+    // Explicitly set status to approved
+    $stmt = $conn->prepare("UPDATE users SET status = 'approved', is_approved = 1 WHERE user_id = ? AND role = 'recycling staff'");
+    $stmt->bind_param("i", $staff_id);
+    
+    if ($stmt->execute()) {
+        echo "<script>alert('Staff approved successfully!'); window.location.href='manage_staff.php';</script>";
+    } else {
+        echo "<script>alert('Failed to update status.');</script>";
     }
+    $stmt->close();
+}
     header("Location: approve_factory_staff.php");
     exit();
 }

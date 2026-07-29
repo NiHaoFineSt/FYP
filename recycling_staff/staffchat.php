@@ -3,33 +3,32 @@ session_start();
 require_once __DIR__ . '/../config.php';
 
 // Authentication Check
-if (!isset($_SESSION['staff_id'])) {
-    header("Location: login.php");
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'recycling staff') {
+    header("Location: ../login.php");
     exit();
 }
 
-$current_staff_id = $_SESSION['staff_id'];
+$current_staff_id = $_SESSION['user_id'];
 
-// Get current staff info & assigned center
-$stmt = $conn->prepare("SELECT first_name, last_name, center_id FROM staff WHERE id = ?");
+// Get current logged-in staff info from 'users'
+$stmt = $conn->prepare("SELECT name FROM users WHERE user_id = ?");
 $stmt->bind_param("i", $current_staff_id);
 $stmt->execute();
 $current_user = $stmt->get_result()->fetch_assoc();
-$center_id = $current_user['center_id'];
 
-// Fetch other staff members from users table
-$contacts_query = "SELECT user_id, first_name, last_name, role FROM users WHERE user_id != ? AND (role = 'staff' OR role = 'admin')";
+// Fetch other staff/admin contacts from single 'users' table
+$contacts_query = "SELECT user_id, name, role FROM users WHERE user_id != ? AND (role = 'recycling staff' OR role = 'admin')";
 $stmt = $conn->prepare($contacts_query);
 $stmt->bind_param("i", $current_staff_id);
 $stmt->execute();
 $contacts = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
-// Selected recipient (default to first contact in list if set)
-$active_recipient_id = $_GET['receiver_id'] ?? ($contacts[0]['id'] ?? 0);
+// Selected recipient
+$active_recipient_id = $_GET['receiver_id'] ?? ($contacts[0]['user_id'] ?? 0);
 $active_recipient = null;
 
 if ($active_recipient_id) {
-    $stmt = $conn->prepare("SELECT id, first_name, last_name, role FROM staff WHERE id = ?");
+    $stmt = $conn->prepare("SELECT user_id, name, role FROM users WHERE user_id = ?");
     $stmt->bind_param("i", $active_recipient_id);
     $stmt->execute();
     $active_recipient = $stmt->get_result()->fetch_assoc();
@@ -51,11 +50,11 @@ if ($active_recipient_id) {
             <div class="logo">Recycle<span>Hub</span></div>
             <nav class="side-nav">
                 <a href="recyclingstaff.php">Overview</a>
-                <a href="../managerequest.php">Manage Requests</a>
-                <a href="../inventorylog.php">Inventory Log</a>
+                <a href="managerequest.php">Manage Requests</a>
+                <a href="inventorylog.php">Inventory Log</a>
                 <a href="staffscan.php">Scan QR</a>
                 <a href="factory.php">Factory Recs</a>
-                <a href="../staffchat.php" class="active">Staff Chat</a>
+                <a href="staffchat.php" class="active">Staff Chat</a>
                 <a href="staff_profile.php">Profile</a>
                 <div class="nav-divider"></div>
                 <a href="../logout.php" class="logout">Logout</a>

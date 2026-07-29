@@ -1,210 +1,129 @@
 <?php
+// 1. Start buffering to prevent "Header already sent" warnings
+ob_start(); 
 session_start();
-include __DIR__ . '/config.php';
+include 'config.php';
 
-$error = '';
+$error = "";
 
-// If already logged in, redirect to their respective dashboard
-if (isset($_SESSION['user_id']) && isset($_SESSION['role'])) {
-    if ($_SESSION['role'] === 'admin') {
-        header("Location: admin/admin_dashboard.php");
-    } elseif ($_SESSION['role'] === 'factory') {
-        header("Location: factory/factory_dashboard.php");
-    } else {
-        header("Location: index.php");
-    }
-    exit();
-}
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $email = trim($_POST['email']);
+    $password = $_POST['password'];
 
-// Process login form submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email    = trim($_POST['email'] ?? '');
-    $password = trim($_POST['password'] ?? '');
+    // 2. Prepared Statement to prevent SQL injection
+    $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-    if (!empty($email) && !empty($password)) {
-        // Prepare statement to fetch user data safely
-        $stmt = $conn->prepare("SELECT * FROM users WHERE email = ? LIMIT 1");
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
-        $result = $stmt->get_result();
+    if ($result && $result->num_rows > 0) {
+        $user = $result->fetch_assoc();
+        
+        // 3. Verify the hashed password
+        if (password_verify($password, $user['password'])) {
 
-        if ($result && $result->num_rows === 1) {
-            $user = $result->fetch_assoc();
+            // --- APPROVAL CHECKS FOR STAFF & FACTORY ROLES ---
+            // Handles both 'status' ('pending'/'approved') and 'is_approved' (0/1) schema variations safely
+            $status_is_approved = (!isset($user['status']) || strtolower($user['status']) === 'approved');
+            $flag_is_approved   = (!isset($user['is_approved']) || (int)$user['is_approved'] === 1);
 
-            // Verify hashed password
-            if (password_verify($password, $user['password'])) {
+            $is_fully_approved  = $status_is_approved && $flag_is_approved;
 
-                // Safely evaluate approval status across 'status' and 'is_approved' columns
-                $status_is_approved = (!isset($user['status']) || strtolower($user['status']) === 'approved');
-                $flag_is_approved   = (!isset($user['is_approved']) || (int)$user['is_approved'] === 1);
-
-                $is_fully_approved  = $status_is_approved && $flag_is_approved;
-
-                // Check approval status for restricted roles
-                if (!$is_fully_approved && in_array($user['role'], ['factory', 'recycling staff'])) {
-                    if ($user['role'] === 'factory') {
-                        $error = "Your factory staff account is pending admin approval. Please wait for an administrator to activate your account.";
-                    } else {
-                        $error = "Your recycling staff account is pending admin approval. Please wait for document review.";
-                    }
-                } else {
-                    // Login successful: Set up session variables
-                    $_SESSION['user_id'] = $user['user_id'];
-                    $_SESSION['role']    = $user['role'];
-                    $_SESSION['name']    = $user['name'];
-
-                    // Redirect based on user role
-                    if ($user['role'] === 'admin') {
-                        header("Location: admin/admin_dashboard.php");
-                    } elseif ($user['role'] === 'factory') {
-                        header("Location: factory/factory_dashboard.php");
-                    } else {
-                        header("Location: index.php");
-                    }
-                    exit();
+            if (!$is_fully_approved && in_array($user['role'], ['factory', 'recycling staff'])) {
+                if ($user['role'] === 'recycling staff') {
+                    $error = "Your recycling staff account is pending admin approval. Please wait for document review.";
+                } elseif ($user['role'] === 'factory') {
+                    $error = "Your factory staff account is pending admin approval. Please wait for an administrator to activate your account.";
                 }
             } else {
-                $error = "Invalid email or password.";
+                // Login Success! Set session variables
+                $_SESSION['user_id'] = $user['user_id'];
+                $_SESSION['name']    = $user['name'];
+                $_SESSION['role']    = $user['role'];
+
+                ob_end_clean(); 
+
+                // 4. Redirect based on role
+                if ($user['role'] === 'admin') {
+                    header("Location: admin.php");
+                } elseif ($user['role'] === 'factory') {
+                    header("Location: factory/factorystaff.php");
+                } elseif ($user['role'] === 'recycling staff') {
+                    header("Location: recycling_staff/recyclingstaff.php");
+                } else {
+                    header("Location: user/citizen_dashboard.php");
+                }
+                exit();
             }
         } else {
-            $error = "Invalid email or password.";
+            $error = "Incorrect password!";
         }
-        $stmt->close();
     } else {
-        $error = "Please fill in all required fields.";
+        $error = "No account found with that email!";
     }
+    $stmt->close();
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login | RecycleHub</title>
-    <link rel="stylesheet" href="admin/admin_dashboard.css">
-    <style>
-        .login-body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-color: #f4f7f6;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-        }
-
-        .login-card {
-            background: #ffffff;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            width: 100%;
-            max-width: 420px;
-            box-sizing: border-box;
-        }
-
-        .login-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .login-header h2 {
-            margin: 0;
-            color: #2d5a27;
-            font-size: 2rem;
-            font-weight: 700;
-        }
-
-        .login-header p {
-            margin-top: 8px;
-            color: #666;
-            font-size: 0.95rem;
-        }
-
-        .alert-error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-            padding: 12px 16px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            margin-bottom: 20px;
-            line-height: 1.4;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #333;
-            font-size: 0.9rem;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 12px 14px;
-            border: 1px solid #cccccc;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            box-sizing: border-box;
-            transition: border-color 0.2s;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: #2d5a27;
-        }
-
-        .btn-submit {
-            width: 100%;
-            background-color: #2d5a27;
-            color: #ffffff;
-            padding: 14px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .btn-submit:hover {
-            background-color: #1e3d1a;
-        }
-    </style>
+    <link rel="stylesheet" href="relog.css">
+    <link rel="stylesheet" href="style.css">
 </head>
-<body class="login-body">
+<body>
 
-    <div class="login-card">
-        <div class="login-header">
-            <h2>Welcome Back</h2>
-            <p>Log in to your RecycleHub account</p>
+    <nav class="navbar">
+        <div class="logo">Recycle<span>Hub</span></div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="register.php" class="btn-primary" style="text-decoration:none; color:white;">Register</a></li>
+        </ul>
+    </nav>
+
+    <section class="auth-screen">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h2>Welcome Back</h2>
+                <p>Log in to your RecycleHub account</p>
+            </div>
+
+            <?php if(!empty($error)): ?>
+                <div style="color: #d9534f; background: #f2dede; padding: 12px; border-radius: 8px; text-align: center; font-size: 0.9rem; margin-bottom: 20px; border: 1px solid #ebccd1;">
+                    ⚠️ <?php echo htmlspecialchars($error); ?>
+                </div>
+            <?php endif; ?>
+
+            <form method="POST" action="login.php">
+                <div class="input-group">
+                    <label style="display:block; margin-bottom: 8px; font-weight:600;">Email Address</label>
+                    <input type="email" name="email" placeholder="name@company.com" required 
+                           value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>"
+                           style="width:100%; padding:12px; border:1px solid #ddd; border-radius:8px; box-sizing: border-box;">
+                </div>
+
+                <div class="input-group" style="margin-top: 15px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <label style="font-weight:600;">Password</label>
+                        <a href="#" style="font-size: 0.8rem; color: #68b04d; text-decoration: none;">Forgot?</a>
+                    </div>
+                    <input type="password" name="password" placeholder="••••••••" required 
+                           style="width:100%; padding:12px; border:1px solid #ddd; border-radius:8px; box-sizing: border-box;">
+                </div>
+
+                <button type="submit" class="btn-primary" style="width:100%; margin-top: 25px; padding: 12px; border:none; border-radius:8px; cursor:pointer; font-weight:bold;">
+                    Sign In
+                </button>
+            </form>
+
+            <p class="auth-switch" style="text-align:center; margin-top: 20px; color: #666;">
+                New to the hub? <a href="register.php" style="color: #2d5a27; text-decoration:none; font-weight:bold;">Create an account</a>
+            </p>
         </div>
-
-        <?php if (!empty($error)): ?>
-            <div class="alert-error">
-                ⚠️ <?= htmlspecialchars($error); ?>
-            </div>
-        <?php endif; ?>
-
-        <form method="POST" action="login.php">
-            <div class="form-group">
-                <label for="email">Email Address</label>
-                <input type="email" id="email" name="email" placeholder="name@company.com" required value="<?= htmlspecialchars($_POST['email'] ?? '') ?>">
-            </div>
-
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" placeholder="••••••••" required>
-            </div>
-
-            <button type="submit" class="btn-submit">Sign In</button>
-        </form>
-    </div>
+    </section>
 
 </body>
 </html>

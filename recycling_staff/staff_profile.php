@@ -3,37 +3,41 @@ session_start();
 require_once __DIR__ . '/../config.php';
 
 // Ensure user is logged in as staff
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
+// 1. Correct session check using 'user_id'
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'recycling staff') {
+    header("Location: ../login.php");
     exit();
 }
 
 $user_id = $_SESSION['user_id'];
 
-// Fetch staff details along with assigned recycling center info
-$query = "SELECT u.*, rc.center_name, rc.location, rc.operating_hours, rc.status AS center_status 
-          FROM users u 
-          LEFT JOIN recycling_centers rc ON u.center_id = rc.id 
-          WHERE u.user_id = ?";
+// 2. Direct query without JOINs to prevent MySQL errors
+$query = "SELECT * FROM users WHERE user_id = ?";
 $stmt = $conn->prepare($query);
+
+if (!$stmt) {
+    die("Query Preparation Failed: " . $conn->error);
+}
+
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
-$staff = $stmt->get_result()->fetch_assoc();
+$user_data = $stmt->get_result()->fetch_assoc();
 
-// Fallback dynamic defaults if fields are unpopulated
-$first_name = htmlspecialchars($staff['first_name'] ?? 'Staff');
-$last_name  = htmlspecialchars($staff['last_name'] ?? 'Member');
-$email      = htmlspecialchars($staff['email'] ?? 'staff@recyclehub.com');
-$phone      = htmlspecialchars($staff['phone'] ?? '+60 12-345 6789');
-$role       = htmlspecialchars($staff['role'] ?? 'Verification Officer');
-$shift      = htmlspecialchars($staff['shift'] ?? 'Morning (08:00 - 16:00)');
-$center_name = htmlspecialchars($staff['center_name'] ?? 'Downtown CRC');
-$center_location = htmlspecialchars($staff['location'] ?? 'Level 2, Central Mall');
-$center_hours = htmlspecialchars($staff['operating_hours'] ?? '08:00 AM - 08:00 PM');
-$center_status = htmlspecialchars($staff['center_status'] ?? 'Active');
+// 3. Fallback variable assignments
+$full_name       = htmlspecialchars($user_data['name'] ?? 'Staff Member');
+$email           = htmlspecialchars($user_data['email'] ?? 'staff@recyclehub.com');
+$phone           = htmlspecialchars($user_data['phone'] ?? '+60 12-345 6789');
+$role            = htmlspecialchars($user_data['role'] ?? 'Recycling Staff');
 
-// Initials for avatar
-$initials = strtoupper(substr($first_name, 0, 1) . substr($last_name, 0, 1));
+// Static / Default fallback values for center info
+$center_name     = 'Downtown CRC';
+$center_location = 'Level 2, Central Mall';
+$center_hours    = '08:00 AM - 08:00 PM';
+$center_status   = 'Active';
+
+// Generate avatar initials safely
+$name_parts = explode(' ', trim($full_name));
+$initials   = strtoupper(substr($name_parts[0] ?? 'S', 0, 1) . substr($name_parts[1] ?? '', 0, 1));
 ?>
 <!DOCTYPE html>
 <html lang="en">

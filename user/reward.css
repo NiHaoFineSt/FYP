@@ -464,7 +464,42 @@ body {
 }
 
 @media (max-width: 768px) {
-    .dash-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
-    .stats-grid { grid-template-columns: 1fr; }
-    .section-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+    /* Stack sidebars and main layout elements vertically */
+    .dashboard-wrapper,
+    .chat-wrapper {
+        flex-direction: column !important;
+        height: auto !important;
+        min-height: auto !important;
+    }
+
+    /* Keep sidebars and lists full width */
+    .sidebar,
+    .chat-list {
+        width: 100% !important;
+        max-height: 200px;
+        border-right: none !important;
+        border-bottom: 2px solid #eeeeee;
+    }
+
+    /* Adjust main content areas for mobile screens */
+    .dashboard-content,
+    .chat-main {
+        width: 100% !important;
+        min-width: 0 !important;
+        padding: 10px !important;
+    }
+
+    /* Fix table scrolling on mobile */
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Prevent message bubbles and cards from overflowing */
+    .msg,
+    .stat-card {
+        max-width: 90% !important;
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
 }

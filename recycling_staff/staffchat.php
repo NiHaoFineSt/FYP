@@ -42,6 +42,49 @@ if ($active_recipient_id) {
     <title>Staff Chat | RecycleHub</title>
     <link rel="stylesheet" href="staffchat.css">
     <link rel="stylesheet" href="recyclingstaff.css">
+    <style>
+        /* Responsive Mobile Fixes */
+        .chat-wrapper {
+            display: flex;
+            height: calc(100vh - 180px);
+            min-height: 450px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .chat-list {
+            width: 280px;
+            border-right: 1px solid #eee;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .chat-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0; /* Prevents flex children from overflowing horizontally */
+        }
+
+        @media (max-width: 768px) {
+            .chat-wrapper {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .chat-list {
+                width: 100%;
+                max-height: 200px;
+                border-right: none;
+                border-bottom: 1px solid #eee;
+            }
+
+            .chat-messages {
+                height: 350px;
+            }
+        }
+    </style>
 </head>
 <body>
 
@@ -67,17 +110,17 @@ if ($active_recipient_id) {
                     <h2>Internal Communication</h2>
                     <p>Direct message colleagues at your recycling hub.</p>
                 </div>
-                <div class="user-badge" style="background: var(--primary-dark); color: white; padding: 8px 16px; border-radius: 8px;">
+                <div class="user-badge" style="background: var(--primary-dark, #2d5a27); color: white; padding: 8px 16px; border-radius: 8px;">
                     Logged in as: <?= htmlspecialchars($current_user['name'] ?? 'Staff') ?>
                 </div>
             </header>
 
-            <div class="chat-wrapper activity-section" style="display: flex; height: 72vh; padding: 0; overflow: hidden; background: white; border-radius: 12px;">
+            <div class="chat-wrapper activity-section">
                 
                 <!-- Contacts List -->
-                <aside class="chat-list" style="width: 300px; border-right: 1px solid var(--border, #eee); overflow-y: auto;">
-                    <div style="padding: 1.2rem; border-bottom: 1px solid var(--border, #eee);">
-                        <input type="text" id="searchContacts" placeholder="Search staff..." class="filter-btn" style="width: 100%; text-align: left; padding: 8px;">
+                <aside class="chat-list">
+                    <div style="padding: 1rem; border-bottom: 1px solid #eee;">
+                        <input type="text" id="searchContacts" placeholder="Search staff..." style="width: 100%; text-align: left; padding: 8px; border: 1px solid #ccc; border-radius: 6px;">
                     </div>
                     
                     <div id="contactsContainer">
@@ -88,11 +131,11 @@ if ($active_recipient_id) {
                                 <?php $isActive = ($contact['user_id'] == $active_recipient_id); ?>
                                 <a href="staffchat.php?receiver_id=<?= $contact['user_id'] ?>" style="text-decoration: none; color: inherit;">
                                     <div class="contact <?= $isActive ? 'active' : '' ?>" 
-                                         style="padding: 1rem 1.5rem; cursor: pointer; border-bottom: 1px solid #f9f9f9; <?= $isActive ? 'background: #e8f5e9; border-left: 4px solid #2d5a27;' : '' ?>">
-                                        <h4 style="font-size: 0.95rem; margin: 0 0 4px 0;">
+                                         style="padding: 0.8rem 1rem; cursor: pointer; border-bottom: 1px solid #f9f9f9; <?= $isActive ? 'background: #e8f5e9; border-left: 4px solid #2d5a27;' : '' ?>">
+                                        <h4 style="font-size: 0.9rem; margin: 0 0 4px 0;">
                                             <?= htmlspecialchars($contact['name'] ?? 'Staff Member') ?>
                                         </h4>
-                                        <p style="font-size: 0.78rem; color: #666; margin: 0;">
+                                        <p style="font-size: 0.75rem; color: #666; margin: 0;">
                                             <?= htmlspecialchars($contact['role'] ?? 'Staff Member') ?>
                                         </p>
                                     </div>
@@ -103,26 +146,26 @@ if ($active_recipient_id) {
                 </aside>
 
                 <!-- Active Chat Area -->
-                <section class="chat-main" style="flex: 1; display: flex; flex-direction: column;">
+                <section class="chat-main">
                     <?php if ($active_recipient): ?>
-                        <div class="chat-main-header" style="padding: 1rem 1.5rem; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+                        <div class="chat-main-header" style="padding: 1rem; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
                             <div>
-                                <h3 style="font-size: 1.1rem; margin: 0;"><?= htmlspecialchars($active_recipient['name'] ?? 'User') ?></h3>
+                                <h3 style="font-size: 1rem; margin: 0;"><?= htmlspecialchars($active_recipient['name'] ?? 'User') ?></h3>
                                 <span style="font-size: 0.75rem; color: #666;"><?= htmlspecialchars($active_recipient['role'] ?? 'Staff Member') ?></span>
                             </div>
                         </div>
 
                         <!-- Messages Window -->
-                        <div id="chatMessages" class="chat-messages" style="flex: 1; padding: 1.5rem; overflow-y: auto; background: #fafafa; display: flex; flex-direction: column; gap: 0.8rem;">
-                            <!-- Messages loaded dynamically via JS -->
+                        <div id="chatMessages" class="chat-messages" style="flex: 1; padding: 1rem; overflow-y: auto; background: #fafafa; display: flex; flex-direction: column; gap: 0.8rem;">
+                            <!-- Dynamic messages -->
                         </div>
 
                         <!-- Send Message Input -->
-                        <div class="chat-input-area" style="padding: 1.2rem 1.5rem; border-top: 1px solid #eee;">
-                            <form id="sendMessageForm" style="display: flex; gap: 1rem;">
+                        <div class="chat-input-area" style="padding: 0.8rem 1rem; border-top: 1px solid #eee;">
+                            <form id="sendMessageForm" style="display: flex; gap: 0.5rem;">
                                 <input type="hidden" id="receiverId" value="<?= $active_recipient['user_id'] ?>">
-                                <input type="text" id="messageInput" placeholder="Type your message..." style="flex: 1; text-align: left; padding: 0.8rem 1.2rem; border: 1px solid #ccc; border-radius: 8px;" required autocomplete="off">
-                                <button type="submit" class="btn-primary" style="background: #2d5a27; color: white; border: none; padding: 0 20px; border-radius: 8px; cursor: pointer;">Send</button>
+                                <input type="text" id="messageInput" placeholder="Type your message..." style="flex: 1; padding: 0.8rem 1rem; border: 1px solid #ccc; border-radius: 8px;" required autocomplete="off">
+                                <button type="submit" style="background: #2d5a27; color: white; border: none; padding: 0 18px; border-radius: 8px; cursor: pointer; font-weight: bold;">Send</button>
                             </form>
                         </div>
                     <?php else: ?>
@@ -135,10 +178,11 @@ if ($active_recipient_id) {
         </main>
     </div>
 
-    <!-- Live Messaging Script -->
+    <!-- Live Anti-Flicker Messaging Script -->
     <script>
         const activeReceiverId = document.getElementById('receiverId') ? document.getElementById('receiverId').value : null;
         const chatMessages = document.getElementById('chatMessages');
+        let lastMessageCount = -1; // Tracking count to prevent flickering resets
 
         function loadMessages() {
             if (!activeReceiverId) return;
@@ -147,29 +191,34 @@ if ($active_recipient_id) {
                 .then(res => res.json())
                 .then(data => {
                     if (data.status === 'success') {
-                        chatMessages.innerHTML = '';
-                        data.messages.forEach(msg => {
-                            const isOutgoing = msg.sender_id == '<?= $current_staff_id ?>';
-                            const msgDiv = document.createElement('div');
-                            msgDiv.className = `msg ${isOutgoing ? 'outgoing' : 'incoming'}`;
+                        // Only update DOM if new messages have arrived
+                        if (data.messages.length !== lastMessageCount) {
+                            lastMessageCount = data.messages.length;
+                            chatMessages.innerHTML = ''; // Rebuild only when message count changes
                             
-                            msgDiv.style.maxWidth = '65%';
-                            msgDiv.style.padding = '0.8rem 1rem';
-                            msgDiv.style.borderRadius = '12px';
-                            msgDiv.style.alignSelf = isOutgoing ? 'flex-end' : 'flex-start';
-                            msgDiv.style.background = isOutgoing ? '#2d5a27' : 'white';
-                            msgDiv.style.color = isOutgoing ? 'white' : '#333';
-                            if(!isOutgoing) msgDiv.style.boxShadow = '0 2px 5px rgba(0,0,0,0.05)';
+                            data.messages.forEach(msg => {
+                                const isOutgoing = msg.sender_id == '<?= $current_staff_id ?>';
+                                const msgDiv = document.createElement('div');
+                                msgDiv.className = `msg ${isOutgoing ? 'outgoing' : 'incoming'}`;
+                                
+                                msgDiv.style.maxWidth = '75%';
+                                msgDiv.style.padding = '0.7rem 0.9rem';
+                                msgDiv.style.borderRadius = '12px';
+                                msgDiv.style.alignSelf = isOutgoing ? 'flex-end' : 'flex-start';
+                                msgDiv.style.background = isOutgoing ? '#2d5a27' : 'white';
+                                msgDiv.style.color = isOutgoing ? 'white' : '#333';
+                                if(!isOutgoing) msgDiv.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
 
-                            msgDiv.innerHTML = `
-                                <p style="font-size: 0.9rem; margin-bottom: 3px;">${msg.message}</p>
-                                <span style="font-size: 0.68rem; color: ${isOutgoing ? '#aec6ab' : '#888'}; display: block; text-align: right;">
-                                    ${msg.formatted_time}
-                                </span>
-                            `;
-                            chatMessages.appendChild(msgDiv);
-                        });
-                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                                msgDiv.innerHTML = `
+                                    <p style="font-size: 0.88rem; margin: 0 0 3px 0; word-break: break-word;">${msg.message}</p>
+                                    <span style="font-size: 0.65rem; color: ${isOutgoing ? '#aec6ab' : '#888'}; display: block; text-align: right;">
+                                        ${msg.formatted_time}
+                                    </span>
+                                `;
+                                chatMessages.appendChild(msgDiv);
+                            });
+                            chatMessages.scrollTop = chatMessages.scrollHeight;
+                        }
                     }
                 });
         }
@@ -196,6 +245,7 @@ if ($active_recipient_id) {
                 .then(data => {
                     if (data.status === 'success') {
                         input.value = '';
+                        lastMessageCount = -1; // Reset count so new sent message loads immediately
                         loadMessages();
                     }
                 });
@@ -204,7 +254,7 @@ if ($active_recipient_id) {
 
         if (activeReceiverId) {
             loadMessages();
-            setInterval(loadMessages, 3000);
+            setInterval(loadMessages, 3000); // Silent background sync without kelip-kelip
         }
     </script>
 </body>

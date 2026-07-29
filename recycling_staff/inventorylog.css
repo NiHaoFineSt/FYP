@@ -61,6 +61,47 @@ body { background-color: var(--bg-light); color: var(--text-main); }
     border-radius: 12px; box-shadow: var(--shadow);
 }
 
+@media (max-width: 768px) {
+    /* Stack sidebars and main layout elements vertically */
+    .dashboard-wrapper,
+    .chat-wrapper {
+        flex-direction: column !important;
+        height: auto !important;
+        min-height: auto !important;
+    }
+
+    /* Keep sidebars and lists full width */
+    .sidebar,
+    .chat-list {
+        width: 100% !important;
+        max-height: 200px;
+        border-right: none !important;
+        border-bottom: 2px solid #eeeeee;
+    }
+
+    /* Adjust main content areas for mobile screens */
+    .dashboard-content,
+    .chat-main {
+        width: 100% !important;
+        min-width: 0 !important;
+        padding: 10px !important;
+    }
+
+    /* Fix table scrolling on mobile */
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Prevent message bubbles and cards from overflowing */
+    .msg,
+    .stat-card {
+        max-width: 90% !important;
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+}
+
 .stat-card h4 { color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; }
 .stat-card p { font-size: 1.8rem; font-weight: bold; color: var(--primary-dark); margin-top: 0.5rem; }
 .stat-card small { font-weight: 600; display: block; margin-top: 5px; }

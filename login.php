@@ -49,7 +49,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 } elseif ($user['role'] === 'factory') {
                     header("Location: factory_staff/factorystaff.php");
                 } elseif ($user['role'] === 'recycling staff') {
-                    header("Location: recycling_staff/recycingstaff.php");
+                    header("Location: recycling_staff/recyclingstaff.php");
                 } else {
                     header("Location: user/citizen_dashboard.php");
                 }

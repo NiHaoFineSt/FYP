@@ -8,21 +8,25 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'recycling staff') {
     exit();
 }
 
-$staff_id = $_SESSION['user_id']; // Ambil ID kakitangan yang sedang log masuk
+$staff_id = $_SESSION['user_id'];
 
-// 2. FETCH TOTALS FOR STAT CARDS (DITAPIS UNTUK AKAUN STAF INI SAHAJA)
+// 2. FETCH TOTALS FOR STAT CARDS (Prepared Statement to prevent SQL Injection/errors)
 $totals_query = "SELECT material_type, SUM(weight) as total_weight 
                  FROM transactions 
-                 WHERE status = 'Verified' AND (staff_id = '$staff_id' OR staff_id IS NULL OR staff_id = 0)
+                 WHERE status = 'Verified' AND (staff_id = ? OR staff_id IS NULL OR staff_id = 0)
                  GROUP BY material_type";
-$totals_res = $conn->query($totals_query);
+
+$stmt = $conn->prepare($totals_query);
+$stmt->bind_param("i", $staff_id);
+$stmt->execute();
+$totals_res = $stmt->get_result();
 
 $totals = ['Plastic' => 0, 'Metal' => 0, 'Glass' => 0, 'Paper' => 0];
 if ($totals_res) {
     while($row = $totals_res->fetch_assoc()) {
-        $type = ucfirst(strtolower($row['material_type'])); // Menyerasikan nama jenis bahan
+        $type = ucfirst(strtolower($row['material_type']));
         if (isset($totals[$type])) {
-            $totals[$type] = $row['total_weight'];
+            $totals[$type] = $row['total_weight'] ?? 0;
         }
     }
 }

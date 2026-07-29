@@ -2,7 +2,7 @@
 session_start();
 require_once __DIR__ . '/../config.php';
 
-// 1. FIXED SECURITY: Check for 'recycling staff' role, not 'citizen'
+// 1. SECURITY: Check for 'recycling staff' role
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'recycling staff') {
     header("Location: ../login.php");
     exit();
@@ -11,7 +11,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'recycling staff') {
 $user_id = $_SESSION['user_id'];
 $message = ""; 
 
-// 2. PHP LOGIC TO PROCESS THE DEPOSIT
+// 2. PROCESS THE DEPOSIT
 if (isset($_POST['deposit_submit'])) {
     $cust_id = intval($_POST['customer_id_hidden']);
     $weight = floatval($_POST['weight']);
@@ -20,28 +20,29 @@ if (isset($_POST['deposit_submit'])) {
     // Points Calculation: 10 points per 1kg
     $points = floor($weight * 10);
 
-    // Start a transaction to ensure both updates happen together
+    // Start transaction
     $conn->begin_transaction();
 
     try {
-        // Update the users table (for the big totals on the dashboard)
-        $updateSql = "UPDATE users SET total_kg = total_kg + ?, total_points = total_points + ? WHERE user_id = ?";
+        // Update users table: updates total_kg, spendable points, AND total_points
+        $updateSql = "UPDATE users SET total_kg = total_kg + ?, points = points + ?, total_points = total_points + ? WHERE user_id = ?";
         $stmtUp = $conn->prepare($updateSql);
-        $stmtUp->bind_param("dii", $weight, $points, $cust_id);
+        $stmtUp->bind_param("diii", $weight, $points, $points, $cust_id);
         $stmtUp->execute();
 
-        // Insert into transactions table (for the history list)
-        $historySql = "INSERT INTO transactions (user_id, material_type, weight, points, status, date) 
-                       VALUES (?, ?, ?, ?, 'Verified', NOW())";
+        // Insert into transactions table with hub_location
+        $hub_location = "Recycling Center"; // Change or customize as needed
+        $historySql = "INSERT INTO transactions (user_id, material_type, weight, points, hub_location, status, date) 
+                       VALUES (?, ?, ?, ?, ?, 'Verified', NOW())";
         $stmtHist = $conn->prepare($historySql);
-        $stmtHist->bind_param("isdi", $cust_id, $material, $weight, $points);
+        $stmtHist->bind_param("isdiss", $cust_id, $material, $weight, $points, $hub_location);
         $stmtHist->execute();
 
         $conn->commit();
         $message = "<div class='alert success'>✅ Success! Added $points points to User #$cust_id.</div>";
     } catch (Exception $e) {
         $conn->rollback();
-        $message = "<div class='alert error'>❌ Error: Points could not be awarded.</div>";
+        $message = "<div class='alert error'>❌ Error: Points could not be awarded. " . $e->getMessage() . "</div>";
     }
 }
 ?>
@@ -69,7 +70,6 @@ if (isset($_POST['deposit_submit'])) {
             <div class="logo">Recycle<span>Hub</span></div>
             <nav class="side-nav">
                 <a href="recyclingstaff.php">Overview</a>
-                <a href="managerequest.php">Manage Requests</a>
                 <a href="inventorylog.php">Inventory Log</a>
                 <a href="staffscan.php" class="active">Scan QR</a>
                 <a href="factory.php">Factory</a>
@@ -131,7 +131,7 @@ if (isset($_POST['deposit_submit'])) {
 
                         <div style="margin-bottom:15px;">
                             <label>Weight (kg)</label>
-                            <input type="number" name="weight" id="w-input" step="0.1" required style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
+                            <input type="number" name="weight" id="w-input" step="0.01" min="0.01" required style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
                         </div>
 
                         <div style="background:#f8f9fa; padding:15px; border-radius:8px; margin-bottom:15px;">

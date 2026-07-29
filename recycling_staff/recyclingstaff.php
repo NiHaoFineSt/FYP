@@ -30,7 +30,6 @@ $today_weight = $weight_res->fetch_assoc()['today_kg'] ?? 0;
             <div class="logo">Recycle<span>Hub</span></div>
             <nav class="side-nav">
                 <a href="recyclingstaff.php" class="active">Overview</a>
-                <a href="managerequest.php">Manage Requests</a>
                 <a href="inventorylog.php">Inventory Log</a>
                 <a href="staffscan.php">Scan QR</a>
                 <a href="factory.php">Factory</a>

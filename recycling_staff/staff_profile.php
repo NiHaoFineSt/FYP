@@ -2,42 +2,41 @@
 session_start();
 require_once __DIR__ . '/../config.php';
 
-// Ensure user is logged in as staff
-// 1. Correct session check using 'user_id'
+// Check user session
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'recycling staff') {
     header("Location: ../login.php");
     exit();
 }
 
-$user_id = $_SESSION['user_id'];
+$staff_id = $_SESSION['user_id'];
 
-// 2. Direct query without JOINs to prevent MySQL errors
+// Query user details directly
 $query = "SELECT * FROM users WHERE user_id = ?";
 $stmt = $conn->prepare($query);
-
-if (!$stmt) {
-    die("Query Preparation Failed: " . $conn->error);
-}
-
-$stmt->bind_param("i", $user_id);
+$stmt->bind_param("i", $staff_id);
 $stmt->execute();
 $user_data = $stmt->get_result()->fetch_assoc();
 
-// 3. Fallback variable assignments
-$full_name       = htmlspecialchars($user_data['name'] ?? 'Staff Member');
-$email           = htmlspecialchars($user_data['email'] ?? 'staff@recyclehub.com');
-$phone           = htmlspecialchars($user_data['phone'] ?? '+60 12-345 6789');
-$role            = htmlspecialchars($user_data['role'] ?? 'Recycling Staff');
+// Split 'name' into first name and last name for input fields
+$full_name  = trim($user_data['name'] ?? 'Staff Member');
+$name_parts = explode(' ', $full_name, 2);
+$first_name = $name_parts[0] ?? 'Staff';
+$last_name  = $name_parts[1] ?? '';
 
-// Static / Default fallback values for center info
+// Define all variables expected by your HTML template
+$email = $user_data['email'] ?? 'staff@recyclehub.com';
+$phone = $user_data['phone'] ?? '+60 12-345 6789';
+$role  = $user_data['role']  ?? 'recycling staff';
+$shift = 'Morning (08:00 - 16:00)'; // Default shift string
+
+// Define center fallbacks
 $center_name     = 'Downtown CRC';
 $center_location = 'Level 2, Central Mall';
 $center_hours    = '08:00 AM - 08:00 PM';
 $center_status   = 'Active';
 
-// Generate avatar initials safely
-$name_parts = explode(' ', trim($full_name));
-$initials   = strtoupper(substr($name_parts[0] ?? 'S', 0, 1) . substr($name_parts[1] ?? '', 0, 1));
+// Initials for avatar
+$initials = strtoupper(substr($first_name, 0, 1) . substr($last_name ?: $first_name, 0, 1));
 ?>
 <!DOCTYPE html>
 <html lang="en">

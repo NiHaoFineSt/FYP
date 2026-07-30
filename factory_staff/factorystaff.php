@@ -74,9 +74,26 @@ $pending_result = $conn->query($pending_query);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Factory Command Center | RecycleHub</title>
     
-    <!-- Link Main Global Layout and Page CSS -->
-    <link rel="stylesheet" href="../style.css">
+    <!-- Root-absolute path ensures style.css loads regardless of folder depth -->
+    <link rel="stylesheet" href="/style.css">
     <link rel="stylesheet" href="factorystaff.css">
+    
+    <!-- Embedded Layout Backup: Ensures sidebar & layout stay intact if style.css is missing -->
+    <style>
+        .dashboard-wrapper { display: flex; min-height: 100vh; }
+        .sidebar { width: 240px; background-color: #1b3818; color: #fff; padding: 20px; flex-shrink: 0; }
+        .sidebar .logo { font-size: 22px; font-weight: bold; margin-bottom: 30px; color: #fff; }
+        .sidebar .logo span { color: #68b04d; }
+        .side-nav { display: flex; flex-direction: column; gap: 8px; }
+        .side-nav a { color: #d0e7cb; text-decoration: none; padding: 10px 14px; border-radius: 6px; font-weight: 500; display: block; }
+        .side-nav a:hover, .side-nav a.active { background-color: #2d5a27; color: #fff; }
+        .side-nav a.logout { color: #f87171; margin-top: 20px; }
+        .nav-divider { height: 1px; background-color: rgba(255,255,255,0.1); margin: 10px 0; }
+        .dashboard-content { flex: 1; padding: 30px; background-color: #f8fafc; }
+        .dash-header { margin-bottom: 25px; }
+        .dash-header h2 { color: #1e293b; font-size: 24px; font-weight: 700; }
+        .dash-header p { color: #64748b; margin-top: 4px; }
+    </style>
 </head>
 <body>
 
@@ -126,7 +143,6 @@ $pending_result = $conn->query($pending_query);
                                     <p>Weight: <strong><?= number_format($req['weight'], 1) ?> kg</strong></p>
                                 </div>
                                 <div class="actions">
-                                    <!-- Accept Form -->
                                     <form method="POST" action="factorystaff.php" onsubmit="return confirm('Accept this transfer request?');" style="display:inline-block;">
                                         <input type="hidden" name="request_id" value="<?= $req['id'] ?>">
                                         <input type="hidden" name="request_weight" value="<?= $req['weight'] ?>">
@@ -134,7 +150,6 @@ $pending_result = $conn->query($pending_query);
                                         <button type="submit" class="btn-accept">Accept</button>
                                     </form>
 
-                                    <!-- Reject Form -->
                                     <form method="POST" action="factorystaff.php" onsubmit="return confirm('Reject this transfer request?');" style="display:inline-block;">
                                         <input type="hidden" name="request_id" value="<?= $req['id'] ?>">
                                         <input type="hidden" name="request_weight" value="<?= $req['weight'] ?>">

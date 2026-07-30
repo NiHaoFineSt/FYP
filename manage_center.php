@@ -11,12 +11,12 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 // 2. ACTION: ADD NEW CENTER
 if (isset($_POST['add_center'])) {
     $name = trim($_POST['center_name']);
-    $loc = trim($_POST['location']);
+    $loc = trim($_POST['location']); // Form input value
     $contact = trim($_POST['contact_number']);
     $state = trim($_POST['state']);
     
-    // Prepared statement handling state column to prevent database errors
-    $stmt = $conn->prepare("INSERT INTO recycling_centers (center_name, location, contact_number, state) VALUES (?, ?, ?, ?)");
+    // Updated query to target 'full_address' instead of 'location'
+    $stmt = $conn->prepare("INSERT INTO recycling_centers (center_name, full_address, contact_number, state) VALUES (?, ?, ?, ?)");
     $stmt->bind_param("ssss", $name, $loc, $contact, $state);
     
     if ($stmt->execute()) {
@@ -126,6 +126,7 @@ $result = $conn->query("SELECT * FROM recycling_centers ORDER BY center_id DESC"
                             <option value="Perlis">Perlis</option>
                             <option value="Sabah">Sabah</option>
                             <option value="Sarawak">Sarawak</option>
+                            <option value="Putrajaya">Putrajaya</option>
                         </select>
                     </div>
                     <div class="input-group">
@@ -156,13 +157,17 @@ $result = $conn->query("SELECT * FROM recycling_centers ORDER BY center_id DESC"
                 <tbody>
                     <?php if ($result && $result->num_rows > 0): ?>
                         <?php while($row = $result->fetch_assoc()): ?>
+                            <?php 
+                                // Handles both column naming possibilities dynamically
+                                $address = $row['full_address'] ?? $row['location'] ?? '';
+                            ?>
                             <tr>
                                 <td><strong>#<?= $row['center_id']; ?></strong></td>
                                 <td><?= htmlspecialchars($row['center_name']); ?></td>
                                 <td><?= htmlspecialchars($row['state'] ?? 'N/A'); ?></td>
                                 <td>
-                                    <?= htmlspecialchars($row['location']); ?><br>
-                                    <a href="https://www.google.com/maps/search/?api=1&query=<?= urlencode($row['location'] . ' ' . ($row['state'] ?? '')); ?>" 
+                                    <?= htmlspecialchars($address); ?><br>
+                                    <a href="https://www.google.com/maps/search/?api=1&query=<?= urlencode($address . ' ' . ($row['state'] ?? '')); ?>" 
                                        target="_blank" style="color:#2d4a27; text-decoration:none; font-weight:bold; font-size:12px;">
                                         📍 View on Map
                                     </a>

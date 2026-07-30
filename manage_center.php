@@ -8,28 +8,34 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit();
 }
 
-// 2. ACTION: ADD NEW CENTER 
+// 2. ACTION: ADD NEW CENTER
 if (isset($_POST['add_center'])) {
-    $name = mysqli_real_escape_string($conn, $_POST['center_name']);
-    $loc = mysqli_real_escape_string($conn, $_POST['location']);
-    $contact = mysqli_real_escape_string($conn, $_POST['contact_number']);
+    $name = trim($_POST['center_name']);
+    $loc = trim($_POST['location']);
+    $contact = trim($_POST['contact_number']);
     
-    // This query now works because the columns 'location' and 'contact_number' exist
-    $sql = "INSERT INTO recycling_centers (center_name, location, contact_number) 
-            VALUES ('$name', '$loc', '$contact')";
+    // Prepared Statement prevents SQL syntax crashes and SQL Injection
+    $stmt = $conn->prepare("INSERT INTO recycling_centers (center_name, location, contact_number) VALUES (?, ?, ?)");
+    $stmt->bind_param("sss", $name, $loc, $contact);
     
-    if ($conn->query($sql)) {
+    if ($stmt->execute()) {
+        $stmt->close();
         header("Location: manage_center.php?status=success");
         exit();
     } else {
         $error_msg = "Database Error: " . $conn->error;
+        $stmt->close();
     }
 }
 
 // 3. ACTION: DELETE CENTER
 if (isset($_GET['delete_id'])) {
     $id = intval($_GET['delete_id']);
-    $conn->query("DELETE FROM recycling_centers WHERE center_id = $id");
+    $del_stmt = $conn->prepare("DELETE FROM recycling_centers WHERE center_id = ?");
+    $del_stmt->bind_param("i", $id);
+    $del_stmt->execute();
+    $del_stmt->close();
+    
     header("Location: manage_center.php?status=deleted");
     exit();
 }
@@ -67,6 +73,8 @@ $result = $conn->query("SELECT * FROM recycling_centers ORDER BY center_id DESC"
         .data-table th { text-align: left; padding: 15px; background: #f8faf9; color: #666; border-bottom: 2px solid #eee; text-transform: uppercase; font-size: 12px; }
         .data-table td { padding: 15px; border-bottom: 1px solid #eee; font-size: 14px; }
         .btn-delete { color: #d9534f; text-decoration: none; font-weight: bold; }
+        
+        .alert-error { background: #f8d7da; color: #721c24; padding: 12px 18px; border-radius: 8px; margin-bottom: 20px; }
     </style>
 </head>
 <body>
@@ -85,9 +93,13 @@ $result = $conn->query("SELECT * FROM recycling_centers ORDER BY center_id DESC"
     <main class="main-content">
         <h2 style="margin-bottom: 20px;">Recycling Center Management</h2>
         
+        <?php if (!empty($error_msg)): ?>
+            <div class="alert-error"><?= htmlspecialchars($error_msg) ?></div>
+        <?php endif; ?>
+
         <div class="admin-box">
             <h3 style="margin-bottom:20px;">Add New Center</h3>
-            <form method="POST">
+            <form method="POST" action="manage_center.php">
                 <div class="input-grid">
                     <div class="input-group">
                         <label>Center Name</label>
@@ -121,17 +133,18 @@ $result = $conn->query("SELECT * FROM recycling_centers ORDER BY center_id DESC"
                     <?php if ($result && $result->num_rows > 0): ?>
                         <?php while($row = $result->fetch_assoc()): ?>
                             <tr>
-                                <td><strong>#<?php echo $row['center_id']; ?></strong></td>
-                                <td><?php echo htmlspecialchars($row['center_name']); ?></td>
+                                <td><strong>#<?= $row['center_id']; ?></strong></td>
+                                <td><?= htmlspecialchars($row['center_name']); ?></td>
                                 <td>
-                                    <a href="https://www.google.com/maps/search/?api=1&query=<?php echo urlencode($row['location']); ?>" 
-                                       target="_blank" style="color:#2d4a27; text-decoration:none; font-weight:bold;">
-                                       📍 View on Map
+                                    <?= htmlspecialchars($row['location']); ?><br>
+                                    <a href="https://www.google.com/maps/search/?api=1&query=<?= urlencode($row['location']); ?>" 
+                                       target="_blank" style="color:#2d4a27; text-decoration:none; font-weight:bold; font-size:12px;">
+                                        📍 View on Map
                                     </a>
                                 </td>
-                                <td><?php echo htmlspecialchars($row['contact_number'] ?: 'N/A'); ?></td>
+                                <td><?= htmlspecialchars($row['contact_number'] ?: 'N/A'); ?></td>
                                 <td>
-                                    <a href="manage_center.php?delete_id=<?php echo $row['center_id']; ?>" 
+                                    <a href="manage_center.php?delete_id=<?= $row['center_id']; ?>" 
                                        class="btn-delete" 
                                        onclick="return confirm('Remove this center?')">Delete</a>
                                 </td>

@@ -50,15 +50,12 @@ $load_row = $load_res->fetch_assoc();
 $current_capacity = floatval($load_row['total_weight'] ?? 0.0);
 
 $fill_percent = min(100, round(($current_capacity / $max_capacity) * 100, 1));
-$status_badge = "NORMAL";
-$badge_class = "status-badge";
+$status_badge = "LIVE LOAD";
 
 if ($fill_percent >= 85 && $fill_percent < 100) {
     $status_badge = "HIGH LOAD";
-    $badge_class .= " high-load";
 } elseif ($fill_percent >= 100) {
-    $status_badge = "FULL";
-    $badge_class .= " full-load";
+    $status_badge = "FACTORY FULL";
 }
 
 // 2. FETCH PENDING REQUESTS JOINED WITH STAFF NAME
@@ -77,57 +74,9 @@ $pending_result = $conn->query($pending_query);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Factory Command Center | RecycleHub</title>
     
-    <!-- Link external stylesheets -->
+    <!-- Link Main Global Layout and Page CSS -->
     <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="factorystaff.css">
-    
-    <!-- Self-Contained Fallback Styling (Fixes layout if external CSS fails) -->
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #f4f7f6; color: #333; }
-        
-        /* Sidebar Layout */
-        .dashboard-wrapper { display: flex; min-height: 100vh; }
-        .sidebar { width: 250px; background-color: #1e293b; color: #fff; padding: 20px; flex-shrink: 0; }
-        .sidebar .logo { font-size: 24px; font-weight: bold; margin-bottom: 30px; color: #fff; }
-        .sidebar .logo span { color: #4ade80; }
-        .side-nav { display: flex; flex-direction: column; gap: 10px; }
-        .side-nav a { color: #94a3b8; text-decoration: none; padding: 12px 15px; border-radius: 8px; font-weight: 500; display: block; }
-        .side-nav a:hover, .side-nav a.active { background-color: #334155; color: #fff; }
-        .side-nav a.logout { color: #f87171; margin-top: 20px; }
-        .nav-divider { height: 1px; background-color: #334155; margin: 10px 0; }
-        
-        /* Main Dashboard Content */
-        .dashboard-content { flex: 1; padding: 30px; background-color: #f8fafc; }
-        .dash-header { margin-bottom: 25px; }
-        .dash-header h2 { color: #0f172a; font-size: 24px; font-weight: 700; }
-        .dash-header p { color: #64748b; margin-top: 4px; }
-        
-        /* Capacity Card */
-        .capacity-card { background: #fff; padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 25px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .cap-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .cap-header h3 { font-size: 18px; color: #1e293b; }
-        .status-badge { background-color: #22c55e; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
-        .status-badge.high-load { background-color: #ed8936; }
-        .status-badge.full-load { background-color: #e53e3e; }
-        .cap-numbers { font-size: 22px; font-weight: bold; color: #0f172a; margin-bottom: 12px; }
-        .cap-bar-bg { width: 100%; height: 12px; background-color: #e2e8f0; border-radius: 6px; overflow: hidden; }
-        .cap-fill { height: 100%; background-color: #22c55e; transition: width 0.4s ease; }
-        
-        /* Requests Section */
-        .req-list { background: #fff; padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .req-list h3 { font-size: 18px; color: #1e293b; margin-bottom: 15px; }
-        .req-item { display: flex; justify-content: space-between; align-items: center; padding: 16px; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 12px; background-color: #fff; }
-        .req-item .info .label { font-size: 12px; color: #64748b; text-transform: uppercase; font-weight: bold; }
-        .req-item .info h4 { font-size: 16px; color: #0f172a; margin: 4px 0; }
-        .req-item .info p { font-size: 14px; color: #475569; }
-        .actions { display: flex; gap: 10px; }
-        .actions form { display: inline-block; }
-        .btn-acc { background-color: #16a34a; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; }
-        .btn-acc:hover { background-color: #15803d; }
-        .btn-rej { background-color: #dc2626; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; }
-        .btn-rej:hover { background-color: #b91c1c; }
-    </style>
 </head>
 <body>
 
@@ -150,17 +99,17 @@ $pending_result = $conn->query($pending_query);
                 </div>
             </header>
 
-            <section class="capacity-card">
-                <div class="cap-header">
-                    <h3>Factory Storage Load</h3>
-                    <span id="status-tag" class="<?= $badge_class ?>"><?= $status_badge ?></span>
-                </div>
-                <div class="cap-main">
-                    <div class="cap-numbers">
-                        <span id="current-cap"><?= number_format($current_capacity, 1) ?></span> / <span id="max-cap"><?= number_format($max_capacity, 1) ?></span> kg
+            <section class="capacity-section">
+                <div class="capacity-card">
+                    <div class="cap-header">
+                        <h3>Factory Storage Load</h3>
+                        <span class="live-label"><?= $status_badge ?></span>
                     </div>
-                    <div class="cap-bar-bg">
-                        <div id="cap-fill" class="cap-fill" style="width: <?= $fill_percent ?>%; <?= ($fill_percent >= 85) ? 'background-color: #e53e3e;' : '' ?>"></div>
+                    <div class="cap-info">
+                        <?= number_format($current_capacity, 1) ?> / <?= number_format($max_capacity, 1) ?> kg
+                    </div>
+                    <div class="cap-bar">
+                        <div class="cap-fill" style="width: <?= $fill_percent ?>%; <?= ($fill_percent >= 85) ? 'background-color: #e53e3e;' : '' ?>"></div>
                     </div>
                 </div>
             </section>
@@ -172,25 +121,25 @@ $pending_result = $conn->query($pending_query);
                         <?php while ($req = $pending_result->fetch_assoc()): ?>
                             <div class="req-item" id="req-<?= $req['id'] ?>">
                                 <div class="info">
-                                    <span class="label">REQ #<?= $req['id'] ?> | Staff: <?= htmlspecialchars($req['staff_name'] ?? 'Staff') ?></span>
-                                    <h4><?= htmlspecialchars($req['material']) ?></h4>
+                                    <span class="staff-tag">REQ #<?= $req['id'] ?> | Staff: <?= htmlspecialchars($req['staff_name'] ?? 'Staff') ?></span>
+                                    <h4 style="margin: 5px 0; font-size: 1.1rem;"><?= htmlspecialchars($req['material']) ?></h4>
                                     <p>Weight: <strong><?= number_format($req['weight'], 1) ?> kg</strong></p>
                                 </div>
                                 <div class="actions">
                                     <!-- Accept Form -->
-                                    <form method="POST" onsubmit="return confirm('Accept this transfer request?');">
+                                    <form method="POST" action="factorystaff.php" onsubmit="return confirm('Accept this transfer request?');" style="display:inline-block;">
                                         <input type="hidden" name="request_id" value="<?= $req['id'] ?>">
                                         <input type="hidden" name="request_weight" value="<?= $req['weight'] ?>">
                                         <input type="hidden" name="action_type" value="Approved">
-                                        <button type="submit" class="btn-acc">Accept</button>
+                                        <button type="submit" class="btn-accept">Accept</button>
                                     </form>
 
                                     <!-- Reject Form -->
-                                    <form method="POST" onsubmit="return confirm('Reject this transfer request?');">
+                                    <form method="POST" action="factorystaff.php" onsubmit="return confirm('Reject this transfer request?');" style="display:inline-block;">
                                         <input type="hidden" name="request_id" value="<?= $req['id'] ?>">
                                         <input type="hidden" name="request_weight" value="<?= $req['weight'] ?>">
                                         <input type="hidden" name="action_type" value="Rejected">
-                                        <button type="submit" class="btn-rej">Reject</button>
+                                        <button type="submit" class="btn-reject">Reject</button>
                                     </form>
                                 </div>
                             </div>

@@ -78,8 +78,7 @@ $pending_result = $conn->query($pending_query);
     <title>Factory Command Center | RecycleHub</title>
     
     <!-- Link to local folder CSS as well as global fallback styles -->
-    <link rel="stylesheet" href="factorystaff.css?v=<?= time(); ?>">
-    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="factorystaff.css">
     
     <style>
         .actions form {

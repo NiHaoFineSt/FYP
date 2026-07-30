@@ -77,7 +77,10 @@ $pending_result = $conn->query($pending_query);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Factory Command Center | RecycleHub</title>
     
-    <!-- Link to local folder CSS as well as global fallback styles -->
+    <!-- 1. Main Root Style (Provides sidebar, dashboard layout, grid styles) -->
+    <link rel="stylesheet" href="../style.css">
+    
+    <!-- 2. Local Page Style -->
     <link rel="stylesheet" href="factorystaff.css">
     
     <style>

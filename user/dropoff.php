@@ -14,13 +14,17 @@ $user_id = $_SESSION['user_id'];
 $states_query = "SELECT DISTINCT state FROM recycling_centers WHERE state IS NOT NULL AND state != '' ORDER BY state ASC";
 $states_result = $conn->query($states_query);
 
-// Fetch distinct locations/cities for the dropdown filter
-$locations_query = "SELECT DISTINCT location FROM recycling_centers WHERE location IS NOT NULL AND location != '' ORDER BY location ASC";
-$locations_result = $conn->query($locations_query);
-
 // Fetch all recycling centers from database
 $hubs_query = "SELECT * FROM recycling_centers ORDER BY center_name ASC";
 $hubs_result = $conn->query($hubs_query);
+
+// Pre-fetch hubs array for reliable PHP & JavaScript usage
+$hubs = [];
+if ($hubs_result && $hubs_result->num_rows > 0) {
+    while ($row = $hubs_result->fetch_assoc()) {
+        $hubs[] = $row;
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -32,7 +36,7 @@ $hubs_result = $conn->query($hubs_query);
     <link rel="stylesheet" href="../style.css"> 
     <link rel="stylesheet" href="dropoff.css">
     <link rel="stylesheet" href="citizen dashboard.css">
-    <!-- QRCode library loaded in head so it's available when needed -->
+    <!-- QRCode library loaded in head -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         .filter-controls {
@@ -91,7 +95,7 @@ $hubs_result = $conn->query($hubs_query);
                     <h3>Interactive Hub Finder</h3>
                     <div class="filter-controls">
                         <!-- State Dropdown Filter -->
-                        <select id="state-filter" class="area-select" onchange="filterHubs()">
+                        <select id="state-filter" class="area-select" onchange="onStateChange()">
                             <option value="all">All States</option>
                             <?php 
                             if ($states_result && $states_result->num_rows > 0) {
@@ -102,16 +106,9 @@ $hubs_result = $conn->query($hubs_query);
                             ?>
                         </select>
 
-                        <!-- Location / City Dropdown Filter -->
+                        <!-- Location / City Dropdown Filter (Dynamically populates based on selected state) -->
                         <select id="location-filter" class="area-select" onchange="filterHubs()">
                             <option value="all">All Locations / Cities</option>
-                            <?php 
-                            if ($locations_result && $locations_result->num_rows > 0) {
-                                while($loc_row = $locations_result->fetch_assoc()) {
-                                    echo '<option value="' . htmlspecialchars($loc_row['location']) . '">' . htmlspecialchars($loc_row['location']) . '</option>';
-                                }
-                            }
-                            ?>
                         </select>
                     </div>
                 </div>
@@ -128,7 +125,7 @@ $hubs_result = $conn->query($hubs_query);
                         <thead>
                             <tr>
                                 <th>Center Name</th>
-                                <th>Location / State</th>
+                                <th>State</th>
                                 <th>Full Address</th>
                                 <th>Operating Hours</th>
                                 <th>Phone Number</th>
@@ -136,30 +133,33 @@ $hubs_result = $conn->query($hubs_query);
                             </tr>
                         </thead>
                         <tbody id="hub-list-body">
-                            <?php if ($hubs_result && $hubs_result->num_rows > 0): ?>
-                                <?php while ($hub = $hubs_result->fetch_assoc()): ?>
+                            <?php if (!empty($hubs)): ?>
+                                <?php foreach ($hubs as $hub): ?>
+                                    <?php 
+                                        $address = $hub['full_address'] ?? $hub['location'] ?? 'N/A';
+                                        $phone = $hub['contact_number'] ?? $hub['phone_number'] ?? 'N/A';
+                                        $state = $hub['state'] ?? '';
+                                        $hours = $hub['service_hours'] ?? 'Mon - Sat (8:00 AM - 5:00 PM)';
+                                    ?>
                                     <tr class="hub-row" 
-                                        data-state="<?= htmlspecialchars($hub['state'] ?? '') ?>" 
-                                        data-location="<?= htmlspecialchars($hub['location'] ?? '') ?>">
+                                        data-state="<?= htmlspecialchars($state) ?>" 
+                                        data-location="<?= htmlspecialchars($address) ?>">
                                         <td><strong><?= htmlspecialchars($hub['center_name']) ?></strong></td>
-                                        <td>
-                                            <?= htmlspecialchars($hub['location']) ?><?= (!empty($hub['state']) ? ', ' . htmlspecialchars($hub['state']) : '') ?>
-                                        </td>
-                                        <td><?= htmlspecialchars($hub['full_address'] ?? 'N/A') ?></td>
-                                        <td><?= htmlspecialchars($hub['service_hours'] ?? 'N/A') ?></td>
-                                        <td><?= htmlspecialchars($hub['phone_number'] ?? 'N/A') ?></td>
+                                        <td><?= htmlspecialchars($state ?: 'N/A') ?></td>
+                                        <td><?= htmlspecialchars($address) ?></td>
+                                        <td><?= htmlspecialchars($hours) ?></td>
+                                        <td><?= htmlspecialchars($phone) ?></td>
                                         <td>
                                             <?php 
-                                                // Uses google_maps_link column, fallback to search query if empty
                                                 $map_url = !empty($hub['google_maps_link']) 
                                                     ? $hub['google_maps_link'] 
-                                                    : "https://www.google.com/maps/search/?api=1&query=" . urlencode($hub['center_name'] . " " . $hub['full_address']);
+                                                    : "https://www.google.com/maps/search/?api=1&query=" . urlencode($hub['center_name'] . " " . $address . " " . $state);
                                             ?>
                                             <a href="<?= htmlspecialchars($map_url) ?>" 
                                                target="_blank" class="btn-outline" style="text-decoration: none; padding: 6px 12px; display: inline-block;">Directions</a>
                                         </td>
                                     </tr>
-                                <?php endwhile; ?>
+                                <?php endforeach; ?>
                             <?php else: ?>
                                 <tr>
                                     <td colspan="6" style="text-align: center; color: #888;">No recycling centers registered yet.</td>
@@ -173,6 +173,9 @@ $hubs_result = $conn->query($hubs_query);
     </div>
 
     <script>
+        // Store PHP hub data in JavaScript for dynamic dropdown population
+        const hubData = <?php echo json_encode($hubs); ?>;
+
         function getLocation() {
             if (navigator.geolocation) {
                 document.getElementById('nearest-info').innerText = "Accessing location...";
@@ -184,6 +187,34 @@ $hubs_result = $conn->query($hubs_query);
 
         function showPosition(position) {
             document.getElementById('nearest-info').innerText = "Showing centers near your current coordinates (" + position.coords.latitude.toFixed(2) + ", " + position.coords.longitude.toFixed(2) + ").";
+        }
+
+        function populateLocations() {
+            var selectedState = document.getElementById('state-filter').value;
+            var locationSelect = document.getElementById('location-filter');
+            
+            locationSelect.innerHTML = '<option value="all">All Locations / Cities</option>';
+            var addedLocations = new Set();
+
+            hubData.forEach(function(hub) {
+                var hubState = hub.state || '';
+                var hubAddress = hub.full_address || hub.location || '';
+
+                if (selectedState === 'all' || hubState.toLowerCase() === selectedState.toLowerCase()) {
+                    if (hubAddress && !addedLocations.has(hubAddress)) {
+                        addedLocations.add(hubAddress);
+                        var opt = document.createElement('option');
+                        opt.value = hubAddress;
+                        opt.textContent = hubAddress;
+                        locationSelect.appendChild(opt);
+                    }
+                }
+            });
+        }
+
+        function onStateChange() {
+            populateLocations();
+            filterHubs();
         }
 
         // Live Filtering Logic
@@ -216,8 +247,10 @@ $hubs_result = $conn->query($hubs_query);
             }
         }
 
-        // Generate Sidebar QR Code
+        // Initialize QR code & location options on load
         window.onload = function() {
+            populateLocations();
+            
             var userId = "<?php echo $user_id; ?>";
             var qrBox = document.getElementById("sidebar-qrcode");
             if (qrBox) {

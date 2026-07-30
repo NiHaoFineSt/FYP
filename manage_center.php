@@ -13,10 +13,11 @@ if (isset($_POST['add_center'])) {
     $name = trim($_POST['center_name']);
     $loc = trim($_POST['location']);
     $contact = trim($_POST['contact_number']);
+    $state = trim($_POST['state']);
     
-    // Prepared Statement prevents SQL syntax crashes and SQL Injection
-    $stmt = $conn->prepare("INSERT INTO recycling_centers (center_name, location, contact_number) VALUES (?, ?, ?)");
-    $stmt->bind_param("sss", $name, $loc, $contact);
+    // Prepared statement handling state column to prevent database errors
+    $stmt = $conn->prepare("INSERT INTO recycling_centers (center_name, location, contact_number, state) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("ssss", $name, $loc, $contact, $state);
     
     if ($stmt->execute()) {
         $stmt->close();
@@ -66,13 +67,15 @@ $result = $conn->query("SELECT * FROM recycling_centers ORDER BY center_id DESC"
         .input-grid { display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end; }
         .input-group { flex: 1; min-width: 200px; }
         .input-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #555; }
-        .input-group input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; }
+        .input-group input, .input-group select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; outline: none; background-color: #fff; }
         .btn-submit { background: #2d4a27; color: white; border: none; padding: 13px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .btn-submit:hover { background: #1f351b; }
         
         .data-table { width: 100%; border-collapse: collapse; }
         .data-table th { text-align: left; padding: 15px; background: #f8faf9; color: #666; border-bottom: 2px solid #eee; text-transform: uppercase; font-size: 12px; }
         .data-table td { padding: 15px; border-bottom: 1px solid #eee; font-size: 14px; }
         .btn-delete { color: #d9534f; text-decoration: none; font-weight: bold; }
+        .btn-delete:hover { text-decoration: underline; }
         
         .alert-error { background: #f8d7da; color: #721c24; padding: 12px 18px; border-radius: 8px; margin-bottom: 20px; }
     </style>
@@ -103,15 +106,35 @@ $result = $conn->query("SELECT * FROM recycling_centers ORDER BY center_id DESC"
                 <div class="input-grid">
                     <div class="input-group">
                         <label>Center Name</label>
-                        <input type="text" name="center_name" required>
+                        <input type="text" name="center_name" required placeholder="e.g. EcoRecycle Subang">
+                    </div>
+                    <div class="input-group">
+                        <label>State</label>
+                        <select name="state" required>
+                            <option value="" disabled selected>Select State</option>
+                            <option value="Selangor">Selangor</option>
+                            <option value="Kuala Lumpur">Kuala Lumpur</option>
+                            <option value="Johor">Johor</option>
+                            <option value="Penang">Penang</option>
+                            <option value="Perak">Perak</option>
+                            <option value="Pahang">Pahang</option>
+                            <option value="Kedah">Kedah</option>
+                            <option value="Melaka">Melaka</option>
+                            <option value="Negeri Sembilan">Negeri Sembilan</option>
+                            <option value="Kelantan">Kelantan</option>
+                            <option value="Terengganu">Terengganu</option>
+                            <option value="Perlis">Perlis</option>
+                            <option value="Sabah">Sabah</option>
+                            <option value="Sarawak">Sarawak</option>
+                        </select>
                     </div>
                     <div class="input-group">
                         <label>Location (Address)</label>
-                        <input type="text" name="location" required>
+                        <input type="text" name="location" required placeholder="Full street address">
                     </div>
                     <div class="input-group">
                         <label>Contact Number</label>
-                        <input type="text" name="contact_number">
+                        <input type="text" name="contact_number" placeholder="e.g. 03-55667788">
                     </div>
                     <button type="submit" name="add_center" class="btn-submit">Add Center</button>
                 </div>
@@ -124,6 +147,7 @@ $result = $conn->query("SELECT * FROM recycling_centers ORDER BY center_id DESC"
                     <tr>
                         <th>ID</th>
                         <th>Center Name</th>
+                        <th>State</th>
                         <th>Location</th>
                         <th>Contact</th>
                         <th>Action</th>
@@ -135,9 +159,10 @@ $result = $conn->query("SELECT * FROM recycling_centers ORDER BY center_id DESC"
                             <tr>
                                 <td><strong>#<?= $row['center_id']; ?></strong></td>
                                 <td><?= htmlspecialchars($row['center_name']); ?></td>
+                                <td><?= htmlspecialchars($row['state'] ?? 'N/A'); ?></td>
                                 <td>
                                     <?= htmlspecialchars($row['location']); ?><br>
-                                    <a href="https://www.google.com/maps/search/?api=1&query=<?= urlencode($row['location']); ?>" 
+                                    <a href="https://www.google.com/maps/search/?api=1&query=<?= urlencode($row['location'] . ' ' . ($row['state'] ?? '')); ?>" 
                                        target="_blank" style="color:#2d4a27; text-decoration:none; font-weight:bold; font-size:12px;">
                                         📍 View on Map
                                     </a>
@@ -151,7 +176,7 @@ $result = $conn->query("SELECT * FROM recycling_centers ORDER BY center_id DESC"
                             </tr>
                         <?php endwhile; ?>
                     <?php else: ?>
-                        <tr><td colspan="5" style="text-align:center; padding:30px; color:#999;">No centers listed.</td></tr>
+                        <tr><td colspan="6" style="text-align:center; padding:30px; color:#999;">No centers listed.</td></tr>
                     <?php endif; ?>
                 </tbody>
             </table>

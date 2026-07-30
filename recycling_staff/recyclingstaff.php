@@ -9,11 +9,11 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'recycling staff') {
 
 $staff_id = $_SESSION['user_id'];
 
-// Stats Queries based on inventory transactions
-$total_items_res = $conn->query("SELECT COUNT(DISTINCT material_type) as total_items FROM inventory_transactions");
+// Stats Queries based on verified transactions
+$total_items_res = $conn->query("SELECT COUNT(DISTINCT material_type) as total_items FROM transactions WHERE status = 'Verified'");
 $total_items = $total_items_res ? ($total_items_res->fetch_assoc()['total_items'] ?? 0) : 0;
 
-$stock_weight_res = $conn->query("SELECT SUM(weight) as total_weight FROM inventory_transactions");
+$stock_weight_res = $conn->query("SELECT SUM(weight) as total_weight FROM transactions WHERE status = 'Verified'");
 $total_stock_weight = $stock_weight_res ? ($stock_weight_res->fetch_assoc()['total_weight'] ?? 0) : 0;
 ?>
 <!DOCTYPE html>
@@ -74,8 +74,8 @@ $total_stock_weight = $stock_weight_res ? ($stock_weight_res->fetch_assoc()['tot
                     </thead>
                     <tbody>
                         <?php
-                        // Fetch latest logs matching the log layout
-                        $log_query = "SELECT * FROM inventory_transactions ORDER BY transaction_id DESC LIMIT 5";
+                        // Fetch verified logs from transactions
+                        $log_query = "SELECT * FROM transactions WHERE status = 'Verified' ORDER BY transaction_id DESC LIMIT 5";
                         $log_res = $conn->query($log_query);
 
                         if ($log_res && $log_res->num_rows > 0):
@@ -85,11 +85,11 @@ $total_stock_weight = $stock_weight_res ? ($stock_weight_res->fetch_assoc()['tot
                             <td style="padding: 12px 5px;">#TX-<?php echo $row['transaction_id'] ?? $row['id']; ?></td>
                             <td style="padding: 12px 5px; font-weight: bold;"><?php echo htmlspecialchars($row['material_type']); ?></td>
                             <td style="padding: 12px 5px; color: green; font-weight: bold;">+ <?php echo number_format($row['weight'], 2); ?> kg</td>
-                            <td style="padding: 12px 5px; color: #666;"><?php echo date("d M Y", strtotime($row['created_at'] ?? $row['date_added'] ?? $row['date'])); ?></td>
+                            <td style="padding: 12px 5px; color: #666;"><?php echo date("d M Y", strtotime($row['date'] ?? $row['created_at'])); ?></td>
                         </tr>
                         <?php endwhile; ?>
                         <?php else: ?>
-                        <tr><td colspan="4" style="padding: 15px; text-align: center; color: #777;">No inventory transaction records found.</td></tr>
+                        <tr><td colspan="4" style="padding: 15px; text-align: center; color: #777;">No verified inventory transaction records found.</td></tr>
                         <?php endif; ?>
                     </tbody>
                 </table>
